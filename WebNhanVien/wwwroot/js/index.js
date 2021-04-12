@@ -32,7 +32,8 @@ $(document).ready(function () {
     });
 
     $("#hoTen").blur(function () {
-        console.log($("#maNhanVien").val());
+        /*console.log($("#maNhanVien").val());*/
+        console.log($("#ngaySinh").val());
         var maNhanVien = $("#maNhanVien").val();
         var hoTen = $("#hoTen").val();
         var ngaySinh = $("#ngaySinh").val();
@@ -67,6 +68,7 @@ $(document).ready(function () {
         });
     });
     $("#ngaySinh").blur(function () {
+        
         var maNhanVien = $("#maNhanVien").val();
         var hoTen = $("#hoTen").val();
         var ngaySinh = $("#ngaySinh").val();
@@ -101,8 +103,99 @@ $(document).ready(function () {
             }
         });
     });
+
+    /*$("#hoTenEdit").blur(function () {
+        console.log($("#maNhanVienEdit").val());
+        var maNhanVien = $("#maNhanVienEdit").val();
+        var hoTen = $("#hoTenEdit").val();
+        var ngaySinh = $("#ngaySinhEdit").val();
+        var soDT = $("#soDTEdit").val();
+
+        var chucVu = $("#chucVuEdit").val();
+
+        $.ajax({
+            type: "Post",
+            url: "/staff/IsDuplicatedStaff",
+            data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
+            dataType: "json",
+            success: function (json) {
+                var a = json;
+                if (a == true) {
+                    $("#EditBtn").prop("disabled", true);
+                    $("#ErrorMgsEdit").text("Nhân Viên Đã Tồn Tại");
+                    $("#hoTenEdit").css("border-color", "red");
+                    $("#ngaySinhEdit").css("border-color", "red");
+                }
+                if (a == false) {
+                    $("#EditBtn").prop('disabled', false);
+                    $("#ErrorMgsEdit").text("");
+                    $("#hoTenEdit").css("border-color", "#ced4da");
+                    $("#ngaySinhEdit").css("border-color", "#eff1f3");
+                }
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+    });
+    $("#ngaySinhEdit").blur(function () {
+        console.log("check edit ");
+        var maNhanVien = $("#maNhanVienEdit").val();
+        var hoTen = $("#hoTenEdit").val();
+        var ngaySinh = $("#ngaySinhEdit").val();
+        var soDT = $("#soDTEdit").val();
+
+        var chucVu = $("#chucVuEdit").val();
+
+        $.ajax({
+            type: "Post",
+            url: "/staff/IsDuplicatedStaff",
+            data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
+            dataType: "json",
+            success: function (json) {
+                var a = json;
+                if (a == true) {
+                    $("#EditBtn").prop("disabled", true);
+                    $("#ErrorMgsEdit").text("Nhân Viên Đã Tồn Tại");
+                    $("#hoTenEdit").css("border-color", "red");
+                    $("#ngaySinhEdit").css("border-color", "red");
+                }
+                if (a == false) {
+                    $("#EditBtn").prop('disabled', false);
+                    $("#CreateFormEdit").unbind(event)
+                    $("#ErrorMgsEdit").text("");
+                    $("#hoTenEdit").css("border-color", "ced4da");
+                    $("#ngaySinhEdit").css("border-color", "ced4da");
+                }
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+    });*/
 });
 
+
+    // Get the modal
+ 
+
+
+    var spanEdit = document.getElementById("closeBtnEdit");
+
+
+
+
+
+
+                        spanEdit.onclick = function () {
+        modal.style.display = "none";
+                        }
+
+
+
+                    
 
 
 

@@ -5,10 +5,12 @@
 
 @{
     ViewData["Title"] = "Danh Sách Nhân Viên";
+    
+    
 }
 
 
-<h1 style="text-align: center;">Danh Sách Nhân Viên</h1>
+<h1 style="text-align: center;">@ViewData["Title"]</h1>
 <div>
 
     <div>
@@ -24,13 +26,6 @@
 
 </div>
 <div>
-
-    @*<p>
-            <a style="margin-top: 20px;" class="btn btn-success" asp-action="create">Thêm Nhân Viên</a>
-
-
-        </p>*@
-
 
 </div>
 
@@ -84,7 +79,76 @@
                 </td>
 
                 <td>
-                    <a class="btn btn-info" style="background-color:#28a745;border-color:#28a745;" href="/Staff/Edit/@item.maNhanVien">Sửa</a>
+                    @*Sửa thông tin==============================================================================================================*@
+
+
+                    <a class="btn btn-info" id="myBtnEdit" style="background-color:#28a745;border-color:#28a745;"  data-toggle="modal" data-target="#editNV-@Model.IndexOf(item)">Sửa</a>
+
+                    <div id="editNV-@Model.IndexOf(item)" class="modal" style="display: none;  position: fixed;  z-index: 9999999999;  left: 0; top: 0; width: 100%;  height: 100%;overflow: auto;  background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
+
+                        <!-- Modal content -->
+                        <div class="modal-content" style=" position: relative; top: 18%; max-width: 60%; margin: auto; min-height: 30%; background-color: #fefefe; width: 100%; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s;">
+                            <div class="modal-header" style=" padding: 2px 16px; background-color: #5cb85c; color: white; text-align: center;display: block;">
+                                <span id="closeBtnEdit">&times;</span>
+                                <h2 style="padding: 15px;">Sửa hồ sơ nhân viên</h2>
+                            </div>
+                            <div class="modal-body" style="padding: 2px 16px;">
+
+                                <form style="display: grid; margin: 20px; color:rgb(0,0,0)" action="/staff/Edit" method="post">
+
+
+                                    @using (Html.BeginForm())
+                                    {
+
+                                        <label type="text" name="maNhanVien">Mã nhân viên</label>
+                                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNhanVienEdit" value=@item.maNhanVien disabled />
+                                        <input name="maNhanVien" value="@item.maNhanVien" hidden />
+
+                                        <label type="text" name="hoTen">Họ và tên</label>
+                                        <input style="margin-bottom: 15px;" type="text" name="hoTen" id="hoTenEdit" value="@item.hoTen" />
+                                        <span id="ErrorMgsEdit" class="text-danger"></span>
+
+
+                                        <label type="date" name="ngaySinh">Ngày sinh</label>
+                                        <input style="margin-bottom: 15px;" name="ngaySinh" type="date" id="ngaySinhEdit" value="@item.ngaySinh.ToString("yyyy-MM-dd")" />
+
+                                        <label type="text" name="soDT">Số điện thoại</label>
+                                        <input style="margin-bottom: 15px;" type="text" name="soDT" id="soDTEdit" value="@item.soDT" />
+
+                                        <label type="text" name="chucVu">Chức vụ</label>
+                                        <input style="margin-bottom: 15px;" type="text" name="chucVu" id="chucVuEdit" value="@item.chucVu" />
+
+                                        <input style="margin-bottom: 15px;" type="submit" id="EditBtn" @*disabled*@ class="btn btn-success" value="Sửa" />
+
+
+                                    }
+                                </form>
+                            </div>
+                            <div class="modal-footer" style="padding: 20px 16px; background-color: #5cb85c; color: #2da949f7; }">
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <style>
+                        #closeBtnEdit {
+                            color: white;
+                            float: right;
+                            font-size: 28px;
+                            font-weight: bold;
+                        }
+
+                            #closeBtnEdit:hover,
+                            #closeBtnEdit:focus {
+                                color: #000;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+                    </style>
+                    
+
+
+                    @*Xóa thông tin==============================================================================================================*@
                     <button type="button" class="btn btn-warning" style="background-color:#900c0c; border-color:#900c0c;color:#ffffff;" data-toggle="modal" data-target="#NV-@Model.IndexOf(item)">Xóa</button>
                     <div class="modal" id="NV-@Model.IndexOf(item)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false">
                         <div class="modal-dialog" role="document">
@@ -113,22 +177,22 @@
     </tbody>
 </table>
 
+
 @*Phần popup tạo nhân viên--------------------------------------------------------*@
 <!DOCTYPE html>
 <html>
 <head>
-    @*using @model WebNhanVien.Models.NhanVien*@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        .closeBtn {
+        .closeBtnCreate {
             color: white;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
 
-            .closeBtn:hover,
-            .closeBtn:focus {
+            .closeBtnCreate:hover,
+            .closeBtnCreate:focus {
                 color: #000;
                 text-decoration: none;
                 cursor: pointer;
@@ -143,58 +207,27 @@
     <button class="btn btn-outline-success" id="myBtn">Thêm nhân viên</button>
 
     <!-- The Modal -->
-    <div id="myModal" class="modal" style="display: none; /* Hidden by default */ position: fixed; /* Stay in place */ z-index: 1; /* Sit on top */ left: 0; top: 0; width: 100%; /* Full width */ height: 100%; /* Full height */ overflow: auto; /* Enable scroll if needed */ background-color: rgb(0,0,0); /* Fallback color */ background-color: rgba(0,0,0,0.4); /* Black w/ opacity */ -webkit-animation-name: fadeIn; /* Fade in the background */ -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
+    <div id="myModal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
 
         <!-- Modal content -->
         <div class="modal-content" style=" position: relative; top: 18%; max-width: 60%; margin: auto; min-height: 30%; background-color: #fefefe; width: 100%; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s;">
             <div class="modal-header" style=" padding: 2px 16px; background-color: #5cb85c; color: white; text-align: center;display: block;">
-                <span class="closeBtn">&times;</span>
+                <span class="closeBtnCreate">&times;</span>
                 <h2 style="padding: 15px;">Thêm hồ sơ nhân viên mới</h2>
             </div>
             <div class="modal-body" style="padding: 2px 16px;">
 
-               @* <form id="CreateForm" asp-action="createNV" asp-controller="staff" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
-                        <label type="text" id="maNhanVien" name="maNhanVien">Mã nhân viên</label>
-                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNhanVien" value="" disabled />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="@Model[0].hoTen" class="control-label">Họ tên</label>
-                        <input asp-for="@Model[0].hoTen" value="" class="form-control" />
-                        <span asp-validation-for="@Model[0].hoTen" class="text-danger"></span>
-
-                    </div>
-                    <p id="ErrorMgs" style="color:red;"></p>
-                    <div class="form-group">
-                        <label asp-for="@Model[0].ngaySinh" class="control-label">Ngày sinh</label>
-                        <input asp-for="@Model[0].ngaySinh" value="" class="form-control" type="date" />
-                        <span asp-validation-for="@Model[0].ngaySinh" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="@Model[0].soDT" class="control-label">Số điện thoại</label>
-                        <input asp-for="@Model[0].soDT" value="" class="form-control" />
-                        <span asp-validation-for="@Model[0].soDT" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="@Model[0].chucVu" class="control-label">Chức vụ</label>
-                        <input asp-for="@Model[0].chucVu" value="" class="form-control" />
-                        <span asp-validation-for="@Model[0].chucVu" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <input type="submit" value="Thêm Mới" class="btn btn-success" id="SubmitBtn" disabled />
-                    </div>
-                </form>*@
-
                 <form style="display: grid; margin: 20px;" action="/staff/CreateNV" method="post">
+                    @{
+                        var maNV = ViewBag.maNV;
+                    }
 
                     @using (Html.BeginForm())
                     {
 
                         <label type="text" name="maNhanVien">Mã nhân viên</label>
-                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNhanVien" value="" disabled />
+                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNhanVien" value=@maNV disabled />
+                        <input name="maNhanVien" value="@maNV" hidden />
 
                         <label type="text" name="hoTen">Họ và tên</label>
                         <input style="margin-bottom: 15px;" type="text" name="hoTen" id="hoTen" />
@@ -231,7 +264,7 @@
         var btn = document.getElementById("myBtn");
 
 
-        var span = document.getElementsByClassName("closeBtn")[0];
+        var span = document.getElementsByClassName("closeBtnCreate")[0];
 
 
 

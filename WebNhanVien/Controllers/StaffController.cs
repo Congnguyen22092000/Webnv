@@ -78,6 +78,16 @@ namespace WebNhanVien.Controllers
 
             }
 
+            if (this.LastStaffId % 10 == 0)
+            {
+                ViewBag.maNV = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2) + "0";
+            }
+            else
+            {
+                ViewBag.maNV = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2);
+            }
+
+
             return View(DsNhanVien);
 
         }
@@ -115,6 +125,8 @@ namespace WebNhanVien.Controllers
                 
 
             }
+
+            
 
             return Redirect("/Staff/Index");
 
@@ -156,9 +168,10 @@ namespace WebNhanVien.Controllers
         [HttpGet]
         public IActionResult CreateNV()
         {
-            /*LastStaffId = JsonConvert.DeserializeObject<float>(HttpContext.Session.GetString("LastStaffId"));
-            
-            ViewBag.StaffListJson = HttpContext.Session.GetString("StaffList");*/
+            LastStaffId = JsonConvert.DeserializeObject<float>(HttpContext.Session.GetString("LastStaffId"));
+
+            /*ViewBag.StaffListJson = HttpContext.Session.GetString("StaffList");*/
+
             return View();
             /*return Redirect("/staff/index");*/
         }
