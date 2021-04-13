@@ -82,7 +82,7 @@
                     @*Sửa thông tin==============================================================================================================*@
 
 
-                    <a class="btn btn-info" id="myBtnEdit" style="background-color:#28a745;border-color:#28a745;"  data-toggle="modal" data-target="#editNV-@Model.IndexOf(item)">Sửa</a>
+                    <a class="click btn btn-info" id="btn_@Model.IndexOf(item)" style="background-color:#28a745;border-color:#28a745;"  data-toggle="modal" data-target="#editNV-@Model.IndexOf(item)">Sửa</a>
 
                     <div id="editNV-@Model.IndexOf(item)" class="modal" style="display: none;  position: fixed;  z-index: 9999999999;  left: 0; top: 0; width: 100%;  height: 100%;overflow: auto;  background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
 
@@ -101,24 +101,25 @@
                                     {
 
                                         <label type="text" name="maNhanVien">Mã nhân viên</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNhanVienEdit" value=@item.maNhanVien disabled />
+                                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNV-@Model.IndexOf(item)" value=@item.maNhanVien disabled />
                                         <input name="maNhanVien" value="@item.maNhanVien" hidden />
 
                                         <label type="text" name="hoTen">Họ và tên</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="hoTen" id="hoTenEdit" value="@item.hoTen" />
-                                        <span id="ErrorMgsEdit" class="text-danger"></span>
+                                        <input style="margin-bottom: 15px;" type="text" name="hoTen" id="hoTen-@Model.IndexOf(item)" class="test" value="@item.hoTen" />
+                                        <span id="errormesageHoTen-@Model.IndexOf(item)" class="text-danger"></span>
 
 
                                         <label type="date" name="ngaySinh">Ngày sinh</label>
-                                        <input style="margin-bottom: 15px;" name="ngaySinh" type="date" id="ngaySinhEdit" value="@item.ngaySinh.ToString("yyyy-MM-dd")" />
+                                        <input style="margin-bottom: 15px;" name="ngaySinh" type="date" id="ngaySinh-@Model.IndexOf(item)" value="@item.ngaySinh.ToString("yyyy-MM-dd")" />
+                                       
 
                                         <label type="text" name="soDT">Số điện thoại</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="soDT" id="soDTEdit" value="@item.soDT" />
+                                        <input style="margin-bottom: 15px;" type="text" name="soDT" id="soDT-@Model.IndexOf(item)" value="@item.soDT" />
 
                                         <label type="text" name="chucVu">Chức vụ</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="chucVu" id="chucVuEdit" value="@item.chucVu" />
+                                        <input style="margin-bottom: 15px;" type="text" name="chucVu" id="chucVu-@Model.IndexOf(item)" value="@item.chucVu" />
 
-                                        <input style="margin-bottom: 15px;" type="submit" id="EditBtn" @*disabled*@ class="btn btn-success" value="Sửa" />
+                                        <input style="margin-bottom: 15px;" type="submit" id="EditBtn-@Model.IndexOf(item)" disabled class="btn btn-success" value="Sửa" />
 
 
                                     }

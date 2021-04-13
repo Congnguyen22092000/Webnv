@@ -144,14 +144,14 @@ namespace WebNhanVien.Controllers
             {
                 DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
                 LastStaffId = JsonConvert.DeserializeObject<float>(HttpContext.Session.GetString("LastStaffId"));
-                if (this.LastStaffId % 10 == 0)
+                /*if (this.LastStaffId % 10 == 0)
                 {
                     newItem.maNhanVien = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2) + "0";
                 }
                 else
                 {
                     newItem.maNhanVien = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2);
-                }
+                }*/
                 newItem.hoTen = XuLyTen(newItem.hoTen);
                 if (!IsDuplicatedStaff(newItem))
                 { 
