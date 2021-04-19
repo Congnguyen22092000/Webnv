@@ -11,6 +11,18 @@
           "lib/netstandard2.0/Humanizer.dll": {}
         }
       },
+      "Microsoft.ApplicationInsights/2.17.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Diagnostics.DiagnosticSource": "5.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.ApplicationInsights.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.ApplicationInsights.dll": {}
+        }
+      },
       "Microsoft.AspNetCore.Cryptography.Internal/5.0.4": {
         "type": "package",
         "compile": {
@@ -1915,6 +1927,27 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "Microsoft.ApplicationInsights/2.17.0": {
+      "sha512": "moAOrjhwiCWdg8I4fXPEd+bnnyCSRxo6wmYQ0HuNrWJUctzZEiyVTbJ8QTS6+dBOFTxpI6x+OY5wHPHrgWOk1Q==",
+      "type": "package",
+      "path": "microsoft.applicationinsights/2.17.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net452/Microsoft.ApplicationInsights.dll",
+        "lib/net452/Microsoft.ApplicationInsights.pdb",
+        "lib/net452/Microsoft.ApplicationInsights.xml",
+        "lib/net46/Microsoft.ApplicationInsights.dll",
+        "lib/net46/Microsoft.ApplicationInsights.pdb",
+        "lib/net46/Microsoft.ApplicationInsights.xml",
+        "lib/netstandard2.0/Microsoft.ApplicationInsights.dll",
+        "lib/netstandard2.0/Microsoft.ApplicationInsights.pdb",
+        "lib/netstandard2.0/Microsoft.ApplicationInsights.xml",
+        "microsoft.applicationinsights.2.17.0.nupkg.sha512",
+        "microsoft.applicationinsights.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Cryptography.Internal/5.0.4": {
@@ -6646,6 +6679,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
+      "Microsoft.ApplicationInsights >= 2.17.0",
       "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore >= 5.0.4",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 5.0.4",
       "Microsoft.AspNetCore.Identity.UI >= 5.0.4",
@@ -6657,19 +6691,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\cong\\.nuget\\packages\\": {}
+    "C:\\Users\\thiet\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\cong\\Downloads\\WebNhanVien\\WebNhanVien\\WebNhanVien.csproj",
+      "projectUniqueName": "D:\\WebNhanVien\\WebNhanVien\\WebNhanVien.csproj",
       "projectName": "WebNhanVien",
-      "projectPath": "C:\\Users\\cong\\Downloads\\WebNhanVien\\WebNhanVien\\WebNhanVien.csproj",
-      "packagesPath": "C:\\Users\\cong\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\cong\\Downloads\\WebNhanVien\\WebNhanVien\\obj\\",
+      "projectPath": "D:\\WebNhanVien\\WebNhanVien\\WebNhanVien.csproj",
+      "packagesPath": "C:\\Users\\thiet\\.nuget\\packages\\",
+      "outputPath": "D:\\WebNhanVien\\WebNhanVien\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\cong\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\thiet\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6695,6 +6729,10 @@
       "net5.0": {
         "targetAlias": "net5.0",
         "dependencies": {
+          "Microsoft.ApplicationInsights": {
+            "target": "Package",
+            "version": "[2.17.0, )"
+          },
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": {
             "target": "Package",
             "version": "[5.0.4, )"

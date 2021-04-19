@@ -3,11 +3,40 @@
 
 //Sự kiện search======================================================
 $(document).ready(function () {
-    $("input[name='key']").on("keyup", function () {
+    /*$("input[name='key']").on("keyup",function () {
         var value = $(this).val().toLowerCase();
         $("#StaffTable tr").filter(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
+    });*/
+
+
+    $("#SearchBox").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        if (value == "") {
+            /*$("#pagenav").show();*/
+            $(".active").trigger("click");
+        }
+        else {
+            /*$("#pagenav").hide();*/
+            $.ajax({
+                type: "Post",
+                url: "/staff/search",
+                data: { key: value },
+                dataType: "text",
+                success: function (data) {
+                    console.log(value);
+                    $("#StaffTable").html(data);
+                    console.log(data);
+
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+
+                }
+            });
+        }
+
     });
 //Sự kiện delete=====================================================
     $(".delBtn").click(function (event) {
@@ -22,7 +51,7 @@ $(document).ready(function () {
             success: function (json) {
                 $("#Huy-" + maNhanVien).trigger("click");
                 $("#" + maNhanVien).closest("tr").remove();
-            },
+            },     
             error: function (req, status, error) {
                 console.log(error);
 
@@ -102,19 +131,39 @@ $(document).ready(function () {
             }
         });
     });
+//Sự kiện thêm=======================================================================
+   /* $(".btnCreate").click(function (even) {
+        event.preventDefault();
+        console.log("oke toi roi");
+        $(".modal").modal("show");
+        
 
+        $('#closeBtnCreate').click(function (event) {
+            console.log("checkkkkkkk");
+            $("#myModal").modal("hide");
+        });
+    });*/
 //sự kiện sửa nhân viên===============================================================
     $(".click").click(function (event) {
+
         event.preventDefault();
         var temp = $(this).attr("id");
         temp = temp.toString().substr(4, 1);
         console.log(temp);
 
+        /*var spanEdit = document.getElementById("closeBtnEdit_" + temp);
+        var modalEdit = document.getElementsByClassName("modalEdit_" +temp);*/
+        $('#closeBtnEdit_' + temp).click(function (event) {
+            console.log("checkkkkkkk");
+            $("#editNV-" + temp).modal("hide");
+        });
+        
 
+        
 
         $('#hoTen-' + temp).blur(function () {
 
-
+      
             var maNhanVien = $('#maNV-' + temp).val();
             var hoTen = $('#hoTen-' + temp).val();
             var ngaySinh = $('#ngaySinh-' + temp).val();
@@ -158,7 +207,7 @@ $(document).ready(function () {
             var ngaySinh = $('#ngaySinh-' + temp).val();
             var soDT = $('#soDT-' + temp).val();
 
-            var chucVu = $('#chucVu-' + temp).val();
+            var chucVu = $('#chucVu-' + temp).val();    
 
             $.ajax({
                 type: "Post",
@@ -186,8 +235,35 @@ $(document).ready(function () {
                 }
             });
         });
+        
     });
-    
+    var modal = document.getElementById("myModal");
+
+
+    var btn = document.getElementById("myBtn");
+
+
+    var span = document.getElementsByClassName("closeBtnCreate")[0];
+
+
+
+
+    btn.onclick = function () {
+        modal.style.display = "block";
+    }
+
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+   
 });
 
 
@@ -195,16 +271,7 @@ $(document).ready(function () {
  
 
 
-    var spanEdit = document.getElementById("closeBtnEdit");
-
-
-
-
-
-
-                        spanEdit.onclick = function () {
-        modal.style.display = "none";
-                        }
+   
 
 
 
