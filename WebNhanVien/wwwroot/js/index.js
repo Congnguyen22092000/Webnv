@@ -3,52 +3,43 @@
 
 //Sự kiện search======================================================
 $(document).ready(function () {
-    /*$("input[name='key']").on("keyup",function () {
-        var value = $(this).val().toLowerCase();
-        $("#StaffTable tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });*/
-
-
+//Sự kiện tìm kiếm====================================================
     $("#SearchBox").on("keyup", function () {
         var value = $(this).val().toLowerCase();
-        if (value == "") {
-            /*$("#pagenav").show();*/
-            $(".active").trigger("click");
-        }
-        else {
-            /*$("#pagenav").hide();*/
-            $.ajax({
-                type: "Post",
-                url: "/staff/search",
-                data: { key: value },
-                dataType: "text",
-                success: function (data) {
-                    console.log(value);
-                    $("#StaffTable").html(data);
-                    console.log(data);
+        console.log(value);
 
-                },
-                error: function (req, status, error) {
-                    console.log(error);
+        $.ajax({
+            type: "Post",
+            url: "/staff/search",
+            data: { key: value },
+            dataType: "text",
+            success: function (data) {
 
-                }
-            });
-        }
+                $("#StaffTable").html(data);
+
+
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+
 
     });
-//Sự kiện delete=====================================================
-    $(".delBtn").click(function (event) {
-        event.preventDefault();
-        var maNhanVien = $(this).attr("id");
 
+    
+//Sự kiện delete=====================================================
+    $(".delBtn").click(function () {
+        var maNhanVien = $(this).attr("id");
+        console.log(maNhanVien);
         $.ajax({
             type: "Post",
             url: "/staff/delete",
             data: { maNhanVien: maNhanVien },
             dataType: "json",
             success: function (json) {
+                console.log(json);
                 $("#Huy-" + maNhanVien).trigger("click");
                 $("#" + maNhanVien).closest("tr").remove();
             },     
@@ -59,6 +50,8 @@ $(document).ready(function () {
         });
 
     });
+
+    
 //sự kiện thêm nhân viên===============================================
     $("#hoTen").blur(function () {
        
@@ -131,18 +124,7 @@ $(document).ready(function () {
             }
         });
     });
-//Sự kiện thêm=======================================================================
-   /* $(".btnCreate").click(function (even) {
-        event.preventDefault();
-        console.log("oke toi roi");
-        $(".modal").modal("show");
-        
 
-        $('#closeBtnCreate').click(function (event) {
-            console.log("checkkkkkkk");
-            $("#myModal").modal("hide");
-        });
-    });*/
 //sự kiện sửa nhân viên===============================================================
     $(".click").click(function (event) {
 
@@ -151,8 +133,7 @@ $(document).ready(function () {
         temp = temp.toString().substr(4, 1);
         console.log(temp);
 
-        /*var spanEdit = document.getElementById("closeBtnEdit_" + temp);
-        var modalEdit = document.getElementsByClassName("modalEdit_" +temp);*/
+      
         $('#closeBtnEdit_' + temp).click(function (event) {
             console.log("checkkkkkkk");
             $("#editNV-" + temp).modal("hide");
@@ -263,6 +244,8 @@ $(document).ready(function () {
             modal.style.display = "none";
         }
     }
+
+    
    
 });
 

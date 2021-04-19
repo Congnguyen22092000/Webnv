@@ -75,6 +75,7 @@ namespace WebNhanVien.Controllers
                 ViewBag.maNV = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2);
             }
 
+            
 
             return View(DsNhanVien);
 
@@ -88,22 +89,31 @@ namespace WebNhanVien.Controllers
 
         }*/
         [HttpPost]
-        public IActionResult Search(string key = "")
+        public IActionResult Search(string key)
         {
-            
-            
-            foreach(NhanVien nv in DsNhanVien)
+            if (key == null)
             {
-                if(nv.maNhanVien.ToLower().IndexOf(key) > -1|| nv.hoTen.ToLower().IndexOf(key) > -1|| nv.ngaySinh.ToShortDateString().ToLower().IndexOf(key) > -1|| nv.soDT.ToString().ToLower().IndexOf(key) > -1|| nv.chucVu.ToString().ToLower().IndexOf(key) > -1)
-                {
-                    DsTimKiem.Add(nv);
-                }
-                
+                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
+                return View(DsNhanVien);
             }
-            HttpContext.Session.SetString("StaffList", JsonConvert.SerializeObject(DsTimKiem));
-            /*HttpContext.Session.SetString("LastStaffId", JsonConvert.SerializeObject(DsTimKiem.Count));*/
-            /*return View(DsTimKiem);*/
-            return View(DsTimKiem);
+            else
+            {
+                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
+                foreach (NhanVien nv in DsNhanVien)
+                {
+                    if (nv.maNhanVien.ToLower().IndexOf(key) > -1 || nv.hoTen.ToLower().IndexOf(key) > -1 /*|| nv.ngaySinh.ToShortDateString().ToLower().IndexOf(key) > -1 || nv.soDT.ToString().ToLower().IndexOf(key) > -1 || nv.chucVu.ToString().ToLower().IndexOf(key) > -1*/)
+                    {
+                        DsTimKiem.Add(nv);
+                    }
+
+                }
+                HttpContext.Session.SetString("SearchList", JsonConvert.SerializeObject(DsTimKiem));
+                return View(DsTimKiem);
+            }
+           
+      
+            
+            
 
         }
 

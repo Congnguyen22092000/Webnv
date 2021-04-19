@@ -3979,3 +3979,4 @@ C:\Users\congn\OneDrive\Tài liệu\WebNhanVien\WebNhanVien\obj\Debug\net5.0\W
 C:\Users\congn\OneDrive\Tài liệu\WebNhanVien\WebNhanVien\obj\Debug\net5.0\WebNhanVien.genruntimeconfig.cache
 C:\Users\congn\OneDrive\Tài liệu\WebNhanVien\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\Search.cshtml.g.cs
 D:\WebNhanVien\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\Search.cshtml.g.cs
+D:\WebNhanVien\WebNhanVien\obj\Debug\net5.0\Razor\Views\Shared\StaffLayout.cshtml.g.cs
