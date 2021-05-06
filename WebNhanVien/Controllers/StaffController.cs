@@ -16,106 +16,53 @@ namespace WebNhanVien.Controllers
     public class StaffController : Controller
     {
         
-        float LastStaffId;
+
         public SessionHelper SessionHelper = new SessionHelper();
+        private int itemPerPage = 6;
+        private string currentPage = "p-1";
 
-
-        public List<NhanVien> DsTimKiem = new List<NhanVien>();
-        public List<NhanVien> DsNhanVien = new List<NhanVien>();
-        public StaffController() {
-            
-                LastStaffId = 6;
-                TaoDsNhanVien();
-            
-
-
-
-        }
+        [HttpGet]
        
-        /*<SessionState timeout = "30" ></ sessionState >*/
-
-
-        public List<NhanVien> TaoDsNhanVien()
-        {
-
-            DsNhanVien.Add(new NhanVien("NV-0001", "Nguyễn Văn Công", DateTime.Parse("7/6/2000"), "09715869331", "Nhân viên"));
-            DsNhanVien.Add(new NhanVien("NV-0002", "Nguyễn Văn Ánh", DateTime.Parse("8/6/1999"), "09715869331", "Nhân viên"));
-            DsNhanVien.Add(new NhanVien("NV-0003", "Lê Thị Huệ", DateTime.Parse("6/3/2000"), "09715869331", "Nhân viên"));
-            DsNhanVien.Add(new NhanVien("NV-0004", "Trần Văn Chung", DateTime.Parse("4/5/2000"), "09715869331", "Nhân viên"));
-            DsNhanVien.Add(new NhanVien("NV-0005", "Bùi Tiến Đạt", DateTime.Parse("12/11/2000"), "09715869331", "Nhân viên"));
-           
-            /*HttpContext.Session.SetObjectAsJson("listNV", DsNhanVien);*/
-            return DsNhanVien;
-        }
 
         [HttpGet]
         public ActionResult Index()
         {
 
-            byte[] json;
-            if (HttpContext.Session.TryGetValue("StaffList", out json) && HttpContext.Session.TryGetValue("LastStaffId", out json))
+            float temp = DBHelper.GetCount() + 1;
+            if (temp > 10 )
             {
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-                LastStaffId = JsonConvert.DeserializeObject<float>(HttpContext.Session.GetString("LastStaffId"));
+                ViewBag.maNV = "NV-00" +  temp.ToString() ;
             }
-            else
-            {
-
-                HttpContext.Session.SetString("StaffList", JsonConvert.SerializeObject(DsNhanVien));
-                HttpContext.Session.SetString("LastStaffId", JsonConvert.SerializeObject(LastStaffId));
-
-            }
-
-            if (this.LastStaffId % 10 == 0)
-            {
-                ViewBag.maNV = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2) + "0";
-            }
-            else
-            {
-                ViewBag.maNV = "NV-" + (this.LastStaffId / 10000).ToString().Substring(2);
-            }
-
             
-
-            return View(DsNhanVien);
-
-        }
-      
-        /*[HttpPost]
-        public ActionResult Index(string key = "")
-        {
-
-            return View();
-
-        }*/
-        [HttpPost]
-        public IActionResult Search(string key)
-        {
-            if (key == null)
+            else
             {
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-                return View(DsNhanVien);
+                ViewBag.maNV = "NV-000" + temp.ToString();
+            }
+
+            if ((int)DBHelper.Get().Count % itemPerPage == 0)
+            {
+                ViewBag.currentPage = "p-" + (int)DBHelper.Get().Count / itemPerPage;
             }
             else
             {
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-                foreach (NhanVien nv in DsNhanVien)
-                {
-                    if (nv.maNhanVien.ToLower().IndexOf(key) > -1 || nv.hoTen.ToLower().IndexOf(key) > -1 /*|| nv.ngaySinh.ToShortDateString().ToLower().IndexOf(key) > -1 || nv.soDT.ToString().ToLower().IndexOf(key) > -1 || nv.chucVu.ToString().ToLower().IndexOf(key) > -1*/)
-                    {
-                        DsTimKiem.Add(nv);
-                    }
-
-                }
-                HttpContext.Session.SetString("SearchList", JsonConvert.SerializeObject(DsTimKiem));
-                return View(DsTimKiem);
+                ViewBag.currentPage = currentPage;
             }
+            ViewBag.pageNumber = (int)DBHelper.Get().Count / itemPerPage;
+
            
-      
-            
-            
+            return View(DBHelper.GetPhongBan());
 
         }
+       
+
+        [HttpPost]
+        public IActionResult Index(string key = "")
+        {
+
+            return View(DBHelper.Get(key));
+
+        }
+        
 
 
 
@@ -123,49 +70,34 @@ namespace WebNhanVien.Controllers
         [HttpPost]
         public IActionResult CreateNV(NhanVien newItem = null)
         {
+            newItem.phong_ban_id = DBHelper.searchPhongBan(newItem.ten_phong_ban);
+            newItem.hoTen = XuLyTen(newItem.hoTen);
+            newItem.diaChi = XuLyTen(newItem.diaChi);
+            DBHelper.Create(newItem);
             
-            byte[] json;
-            if (HttpContext.Session.TryGetValue("StaffList", out json))
-            {
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-                LastStaffId = JsonConvert.DeserializeObject<float>(HttpContext.Session.GetString("LastStaffId"));
-                newItem.hoTen = XuLyTen(newItem.hoTen);
-                if (!IsDuplicatedStaff(newItem))
-                { 
-                    DsNhanVien.Add(newItem);
-                    LastStaffId += 1;
-                }
-                
-                HttpContext.Session.SetString("LastStaffId", JsonConvert.SerializeObject(LastStaffId));
-                HttpContext.Session.SetString("StaffList", JsonConvert.SerializeObject(DsNhanVien));
-
-            }
             return Redirect("/staff/index");
         }
         [HttpGet]
+
+
         public IActionResult CreateNV()
         {
            
             return View();
             
         }
+        
 
         [HttpPost]
         public ActionResult Edit(NhanVien newItem = null)
         {
-           
-            DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-            
-            for (int i = 0; i < DsNhanVien.Count; i++)
-            {
-                if (DsNhanVien[i].maNhanVien == newItem.maNhanVien)
-                {
-                    DsNhanVien[i] = newItem;
-                    HttpContext.Session.SetString("StaffList", JsonConvert.SerializeObject(DsNhanVien));
-                }
-            }
+            newItem.phong_ban_id = DBHelper.searchPhongBan(newItem.ten_phong_ban);
+            newItem.hoTen = XuLyTen(newItem.hoTen);
+            newItem.diaChi = XuLyTen(newItem.diaChi);
+            DBHelper.Update(newItem);
             return Redirect("/staff/index");
         }
+
 
         [HttpGet]
         public ActionResult Edit(string id)
@@ -176,29 +108,15 @@ namespace WebNhanVien.Controllers
       
 
         [HttpPost]
-        public bool Delete(string maNhanVien)
+        public bool Delete(string MaNhanVien)
         {
-           
-            byte[] json;
-            if (HttpContext.Session.TryGetValue("StaffList", out json))
-            {
-               
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-            }
-            for (int i = 0; i < DsNhanVien.Count; i++)
-            {
-                if (DsNhanVien[i].maNhanVien == maNhanVien)
-                {
-                    DsNhanVien.RemoveAt(i);
-
-                    HttpContext.Session.SetString("StaffList", JsonConvert.SerializeObject(DsNhanVien));
-                }
-            }
+            DBHelper.Delete(MaNhanVien);
+            Redirect("/staff/index");
             return true;
         }
+     
 
 
-    
         public string XuLyTen(string name)
         {
             string result = "";
@@ -234,18 +152,67 @@ namespace WebNhanVien.Controllers
             return result;
         }
 
+        //Lien quan toi page----------------------
+        //Tim kiem===============================
+        [HttpPost]
+        public IActionResult Search(string keyPhongBan = "", string keyBox = "")
+        {
+            List<NhanVien> dsTim = DBHelper.Get(keyPhongBan, keyBox);
+            ViewBag.itemPerPage = itemPerPage;
+            if (keyBox == "")
+            {
+                return View(DBHelper.Get());
+            }
+            return View(DBHelper.Get(keyPhongBan, keyBox));
+        }
+        [HttpGet]
+        public ActionResult PageNav()
+        {
+
+            return View();
+        }
+        [HttpPost]
+        public IActionResult PageNav(string currentPage = "p-1",string keyPhongBan="",string keyBox="")
+        {
+            ViewBag.keyBox = keyBox;
+            ViewBag.keyPhongBan = keyPhongBan;
+            if ((int)DBHelper.Get().Count % itemPerPage == 0)
+            {
+                ViewBag.currentPage = "p-" + (int)DBHelper.Get().Count / itemPerPage;
+            }
+            else
+            {
+                ViewBag.currentPage = currentPage;
+            }
+            if((int)DBHelper.Get().Count % itemPerPage == 0)
+            {
+                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage;
+            }
+            else
+            {
+                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage + 1;
+            }
+            
+
+            return View();
+        }
+        [HttpPost]
+        public IActionResult GetPage(int pageIndex, string keyPhongBan = "", string keyBox = "")
+        {
+            ViewBag.dsPhongban = DBHelper.GetPhongBan();
+            ViewBag.pageIndex = pageIndex;
+            ViewBag.itemPerPage = itemPerPage;
+            return View(DBHelper.Get(keyPhongBan, keyBox));
+        }
+
         public bool IsDuplicatedStaff(NhanVien pnv)
         {
             pnv.hoTen = XuLyTen(pnv.hoTen);
             bool daTonTai = false;
-            byte[] json;
-            if (HttpContext.Session.TryGetValue("StaffList", out json))
-            {
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-            }
+            var tempNhanVien = DBHelper.Get();
 
-           
-            foreach (NhanVien nv in DsNhanVien)
+
+            foreach (NhanVien nv in tempNhanVien)
             {
                 
 
@@ -265,28 +232,20 @@ namespace WebNhanVien.Controllers
             return daTonTai;
         }
 
-        public bool EditValidate(NhanVien pnv)
+        [HttpPost]
+        public bool ExcelExport()
         {
-            bool daTonTai = false;
-            byte[] json;
-            if (HttpContext.Session.TryGetValue("StaffList", out json))
-            {
-                DsNhanVien = JsonConvert.DeserializeObject<List<NhanVien>>(HttpContext.Session.GetString("StaffList"));
-            }
-            pnv.hoTen = XuLyTen(pnv.hoTen);
-            for (int i = 0; i < DsNhanVien.Count; i++)
-            {
-                if (DsNhanVien[i].hoTen == pnv.hoTen && DateTime.Compare(DsNhanVien[i].ngaySinh, pnv.ngaySinh) == 0 && DsNhanVien[i].maNhanVien != pnv.maNhanVien)
-                {
-                    daTonTai = true;
-                    break;
-                }
-
-            }
-            return daTonTai;
+            DBHelper.Export(DBHelper.Get());
+            return true;
         }
-      
 
+
+        [HttpPost]
+        public bool checkPhongban()
+        {
+            
+            return true;
+        }
         [HttpGet]
         public ActionResult test()
         {

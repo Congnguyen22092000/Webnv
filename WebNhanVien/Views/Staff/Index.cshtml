@@ -1,27 +1,28 @@
-﻿@model List<WebNhanVien.Models.NhanVien>
+﻿@model List<WebNhanVien.Models.PhongBan>
 @*@model WebNhanVien.Models.NhanVienModel*@
 
 
 @{
     ViewData["Title"] = "Danh Sách Nhân Viên";
-
+    var currentPage = (string)@ViewBag.currentPage;
+    var pageNunber = (int)ViewBag.pageNumber;
 
 }
 <link href="~/css/Staffcss/test.css" rel="stylesheet" type="text/css" />
 
 <h1 style="text-align: center;">@ViewData["Title"]</h1>
-<div>
-   
+<div style="margin-bottom: 20px;">
 
 
-    <div style=" display: -webkit-box;
-">
+
+    <div style="display: -webkit-box;">
         @*Phần popup tạo nhân viên--------------------------------------------------------*@
 
 
 
         <!-- Trigger/Open The Modal -->
         <button class="btn btn-outline-success btnCreate" id="myBtn">Thêm nhân viên</button>
+
 
         <!-- The Modal -->
         <div id="myModal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
@@ -53,36 +54,68 @@
 
                             <label type="date" name="ngaySinh">Ngày sinh</label>
                             <input style="margin-bottom: 15px;" name="ngaySinh" type="date" id="ngaySinh" />
+                            <span id="ErrorMgsDate" class="text-danger"></span>
 
                             <label type="text" name="soDT">Số điện thoại</label>
                             <input style="margin-bottom: 15px;" type="text" name="soDT" id="soDT" />
+                            <span id="ErrorMgsSoDT" class="text-danger"></span>
+
+                            <label type="text" name="diaChi">Địa chỉ</label>
+                            <input style="margin-bottom: 15px;" type="text" name="diaChi" id="diaChi" />
+                            <span id="ErrorMgsDiaChi" class="text-danger"></span>
 
                             <label type="text" name="chucVu">Chức vụ</label>
                             <input style="margin-bottom: 15px;" type="text" name="chucVu" id="chucVu" />
+                            <span id="ErrorMgsChucVu" class="text-danger"></span>
 
-                            <input style="margin-bottom: 15px;" type="submit" id="SubmitBtn" disabled class="btn btn-success" value="Thêm mới" />
+                            <label type="text" name="chucVu">Phòng ban</label>
+                            <select id="phongBan" name="ten_phong_ban" class="form-select " aria-label="Default select example">
+                                <option selected id="0">Chọn phòng ban</option>
+                                @foreach (PhongBan pb in Model)
+                                {
+                                    <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
+                                }
+                            </select>
+                            <span id="ErrorMgsPhongBan" class="text-danger"></span>
+
+                            <input style="margin: 20px 0px;" type="submit" id="SubmitBtn" class="btn btn-success" value="Thêm mới" />
 
 
                         }
                     </form>
                 </div>
                 <div class="modal-footer" style="padding: 20px 16px; background-color: #5cb85c; color: #2da949f7; }">
-                                                                                                                                                       
+
                 </div>
             </div>
 
         </div>
 
-        <form asp-action="index" method="post" asp-controller="Staff" class="input-group" style="margin-bottom: 30px;margin-left: 20px;max-width: 85.5%;">
+        <form asp-action="index" method="post" asp-controller="Staff" class="input-group" style="margin-bottom: 20px;margin-left: 20px;max-width: 83%;">
 
 
-            <input id="SearchBox" name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search"
+            <input id="SearchBox" style=" max-width: 86%;" name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search"
                    aria-describedby="search-addon" />
         </form>
 
+        <button style="position: absolute;margin-left: 966px;" class="btn btn btn-outline-success float-right" id="excelExport"><i class="fas fa-file-excel"></i> Xuất File Excel</button>
+    </div>
+    <div style="display: flex;  ">
+        
+        <div class="btn btn-dark">Phòng ban:</div>
+        <div style=" margin-left: 10px;">
+            <select id="check" class="form-select btn-dark btn" aria-label="Default select example">
+                <option selected id="0">Tất Cả</option>
+                @foreach (PhongBan pb in Model)
+                {
+                    <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
+                }
+            </select>
+        </div>
     </div>
 
 </div>
+
 
 
 <table class="table  table-dark table-striped">
@@ -100,140 +133,26 @@
             <th>
                 Số điện thoại
             </th>
-
+            <th>
+                Địa Chỉ
+            </th>
             <th>
                 Chức vụ
             </th>
-
+            <th>
+                Phòng ban
+            </th>
             <th></th>
         </tr>
     </thead>
-    
+
     <tbody id="StaffTable">
-        @foreach (var item in Model)
-        {
-            var i = 1;
-            <tr>
-                <td>
-                    @item.maNhanVien
-
-                </td>
-                @*id="timKiem"*@
-                <td>
-                    @item.hoTen
-
-                </td>
-                <td>
-
-                    @item.ngaySinh.ToShortDateString()
-                </td>
-                <td>
-                    @item.soDT
-                </td>
-
-                <td>
-                    @item.chucVu
-                </td>
-
-                <td>
-                    @*Sửa thông tin==============================================================================================================*@
-
-
-                    <a class="click btn btn-info" id="btn_@Model.IndexOf(item)" style="background-color:#28a745;border-color:#28a745;cursor: pointer;" data-toggle="modal" data-target="#editNV-@Model.IndexOf(item)">Sửa</a>
-
-                    <div id="editNV-@Model.IndexOf(item)" class="modalEdit_@Model.IndexOf(item)" style="display: none;  position: fixed;  z-index: 9999999999;  left: 0; top: 0; width: 100%;  height: 100%;overflow: auto;  background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
-
-                        <!-- Modal content -->
-                        <div class="modal-content" style=" position: relative; top: 18%; max-width: 60%; margin: auto; min-height: 30%; background-color: #fefefe; width: 100%; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s;">
-                            <div class="modal-header" style=" padding: 2px 16px; background-color: #5cb85c; color: white; text-align: center;display: block;">
-                                <span id="closeBtnEdit_@Model.IndexOf(item)">&times;</span>
-                                <h2 style="padding: 15px;">Sửa hồ sơ nhân viên</h2>
-                            </div>
-                            <div class="modal-body" style="padding: 2px 16px;">
-
-                                <form style="display: grid; margin: 20px; color:rgb(0,0,0)" action="/staff/Edit" method="post">
-
-
-                                    @using (Html.BeginForm())
-                                    {
-
-                                        <label type="text" name="maNhanVien">Mã nhân viên</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNV-@Model.IndexOf(item)" value=@item.maNhanVien disabled />
-                                        <input name="maNhanVien" value="@item.maNhanVien" hidden />
-
-                                        <label type="text" name="hoTen">Họ và tên</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="hoTen" id="hoTen-@Model.IndexOf(item)" class="test" value="@item.hoTen" />
-                                        <span id="errormesageHoTen-@Model.IndexOf(item)" class="text-danger"></span>
-
-
-                                        <label type="date" name="ngaySinh">Ngày sinh</label>
-                                        <input style="margin-bottom: 15px;" name="ngaySinh" type="date" id="ngaySinh-@Model.IndexOf(item)" value="@item.ngaySinh.ToString("yyyy-MM-dd")" />
-
-
-                                        <label type="text" name="soDT">Số điện thoại</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="soDT" id="soDT-@Model.IndexOf(item)" value="@item.soDT" />
-
-                                        <label type="text" name="chucVu">Chức vụ</label>
-                                        <input style="margin-bottom: 15px;" type="text" name="chucVu" id="chucVu-@Model.IndexOf(item)" value="@item.chucVu" />
-
-                                        <input style="margin-bottom: 15px;" type="submit" id="EditBtn-@Model.IndexOf(item)" class="btn btn-success" value="Sửa" />
-
-
-                                    }
-                                </form>
-                            </div>
-                            <div class="modal-footer" style="padding: 20px 16px; background-color: #5cb85c; color: #2da949f7; }">
-
-                            </div>
-                        </div>
-
-                    </div>
-                    <style>
-                        #closeBtnEdit_@Model.IndexOf(item) {
-                            color: white;
-                            float: right;
-                            font-size: 28px;
-                            font-weight: bold;
-                        }
-
-                            #closeBtnEdit_@Model.IndexOf(item):hover,
-                            #closeBtnEdit_@Model.IndexOf(item):focus {
-                                color: #000;
-                                text-decoration: none;
-                                cursor: pointer;
-                            }
-                    </style>
-                   
-
-
-                    @*Xóa thông tin==============================================================================================================*@
-                    <button type="button" class="btn btn-warning" style="background-color:#900c0c; border-color:#900c0c;color:#ffffff;" data-toggle="modal" data-target="#NV-@Model.IndexOf(item)">Xóa</button>
-                    <div class="modal" id="NV-@Model.IndexOf(item)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <i class='fas fa-exclamation-triangle'></i>
-                                    <h5 style="color:#000000;" class="modal-title">Bạn Có Chắc Muốn Xóa</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="Huy-@item.maNhanVien">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body" style="text-align: center;">
-                                    <span style="color:red;">@item.hoTen</span>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                                    <button class="btn btn-danger delBtn" style="background-color:#900c0c;color:#ffffff" id="@item.maNhanVien">Xóa</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            i++;
-        }
+       
     </tbody>
 </table>
+<div id="pagenav">
+    
+</div>
 
 
 

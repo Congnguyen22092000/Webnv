@@ -1,23 +1,63 @@
 ﻿
-
-
-//Sự kiện search======================================================
 $(document).ready(function () {
-//Sự kiện tìm kiếm====================================================
-    $("#SearchBox").on("keyup", function () {
-        var value = $(this).val().toLowerCase();
-        console.log(value);
+    var searchBox = $("#SearchBox").val().toLowerCase();
+    var searchPhongBan = $("#check").val();
+    //Gọi trang đầu===========================================================
+    var value = "p-1";
 
+    $.ajax({
+        type: "Post",
+        url: "/staff/PageNav",
+        data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+        dataType: "text",
+        success: function (data) {
+
+            $("#pagenav").html(data);
+        },
+        error: function (req, status, error) {
+            console.log(error);
+
+        }
+    });
+    //===========================================================================
+    
+    //check phòng ban==========================================================
+    $("#check").change(function () {
+        
+        searchBox = $("#SearchBox").val().toLowerCase();
+        searchPhongBan = $("#check").val();
+        
         $.ajax({
             type: "Post",
-            url: "/staff/search",
-            data: { key: value },
+            url: "/staff/PageNav",
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
             dataType: "text",
             success: function (data) {
+                /*$("#StaffTable").empty();*/
+                $("#pagenav").html(data);
+            },
+            error: function (req, status, error) {
+                console.log(error);
 
-                $("#StaffTable").html(data);
+            }
+        });
+    });
 
-
+    //Sự kiện tìm kiếm====================================================
+    $("#SearchBox").on("keyup", function () {
+         searchBox = $("#SearchBox").val().toLowerCase();
+        searchPhongBan = $("#check").val();
+        console.log("check index");
+        console.log(searchBox);
+        
+        $.ajax({
+            type: "Post",
+            url: "/staff/PageNav",
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+            dataType: "text",
+            success: function (data) {
+                /*$("#StaffTable").empty();*/
+                $("#pagenav").html(data);
             },
             error: function (req, status, error) {
                 console.log(error);
@@ -25,98 +65,174 @@ $(document).ready(function () {
             }
         });
 
-
     });
 
+    //sự kiện thêm nhân viên===============================================
+    var checkHoTen = false;
+    var checkDate = false;
+    var checkSoDT = false;
+    var checkChucVu = false;
     
-//Sự kiện delete=====================================================
-    $(".delBtn").click(function () {
-        var maNhanVien = $(this).attr("id");
-        console.log(maNhanVien);
-        $.ajax({
-            type: "Post",
-            url: "/staff/delete",
-            data: { maNhanVien: maNhanVien },
-            dataType: "json",
-            success: function (json) {
-                console.log(json);
-                $("#Huy-" + maNhanVien).trigger("click");
-                $("#" + maNhanVien).closest("tr").remove();
-            },     
-            error: function (req, status, error) {
-                console.log(error);
 
-            }
-        });
-
-    });
-
-    
-//sự kiện thêm nhân viên===============================================
     $("#hoTen").blur(function () {
-       
+
         var maNhanVien = $("#maNhanVien").val();
         var hoTen = $("#hoTen").val();
         var ngaySinh = $("#ngaySinh").val();
         var soDT = $("#soDT").val();
 
         var chucVu = $("#chucVu").val();
+        console.log(hoTen);
+        if (hoTen == "") {
+            checkHoTen = false;
+           
+            $("#ErrorMgs").text("Bạn bắt buộc phải nhập trường này!");
+        }
+        else {
+            $("#ErrorMgs").text("");
+            $.ajax({
+                type: "Post",
+                url: "/staff/IsDuplicatedStaff",
+                data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
+                dataType: "json",
+                success: function (json) {
+                    var a = json;
+                    if (a == true) {
+                        checkHoTen = false;
+                        $("#SubmitBtn").prop("disabled", true);
+                        $("#ErrorMgs").text("Nhân Viên Đã Tồn Tại");
+                        $("#hoTen").css("border-color", "red");
+                        $("#ngaySinh").css("border-color", "red");
+                    }
+                    if (a == false) {
 
-        $.ajax({
-            type: "Post",
-            url: "/staff/IsDuplicatedStaff",
-            data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
-            dataType: "json",
-            success: function (json) {
-                var a = json;
-                if (a == true) {
-                    $("#SubmitBtn").prop("disabled", true);
-                    $("#ErrorMgs").text("Nhân Viên Đã Tồn Tại");
-                    $("#hoTen").css("border-color", "red");
-                    $("#ngaySinh").css("border-color", "red");
-                }
-                if (a == false) {
-                    $("#SubmitBtn").prop('disabled', false);
-                    $("#ErrorMgs").text("");
-                    $("#hoTen").css("border-color", "#ced4da");
-                    $("#ngaySinh").css("border-color", "#eff1f3");
-                }
-            },
-            error: function (req, status, error) {
-                console.log(error);
+                        checkHoTen = true;
+                        if (checkDate == true && checkSoDT == true && checkChucVu == true) {
+                            $("#SubmitBtn").prop('disabled', false);
+                        }
 
-            }
-        });
+                        $("#ErrorMgs").text("");
+                        $("#hoTen").css("border-color", "#ced4da");
+                        $("#ngaySinh").css("border-color", "#eff1f3");
+                    }
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+
+                }
+
+
+            });
+        }
     });
     $("#ngaySinh").blur(function () {
-        
+
         var maNhanVien = $("#maNhanVien").val();
         var hoTen = $("#hoTen").val();
         var ngaySinh = $("#ngaySinh").val();
         var soDT = $("#soDT").val();
 
         var chucVu = $("#chucVu").val();
+       
+        if (ngaySinh == "") {
+            checkDate = false;
+            $("#ErrorMgsDate").text("Bạn bắt buộc phải nhập trường này!");
+        }
+        else {
+            $("#ErrorMgsDate").text("");
+            $.ajax({
+                type: "Post",
+                url: "/staff/IsDuplicatedStaff",
+                data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
+                dataType: "json",
+                success: function (json) {
+                    var a = json;
+                    if (a == true) {
+                        console.log("check trung true");
+                        checkDate = false;
+                        $("#SubmitBtn").prop("disabled", true);
+                        $("#ErrorMgs").text("Nhân Viên Đã Tồn Tại");
+                        $("#hoTen").css("border-color", "red");
+                        $("#ngaySinh").css("border-color", "red");
+                    }
+                    if (a == false) {
+                        checkDate = true;
+                        if (checkHoTen == true && checkSoDT == true && checkChucVu == true) {
+                            $("#SubmitBtn").prop('disabled', false);
+                        }
+                        /*$("#SubmitBtn").prop('disabled', false);*/
+                        /*$("#CreateForm").unbind(event)*/
+                        $("#ErrorMgs").text("");
+                        $("#hoTen").css("border-color", "#ced4da");
+                        $("#ngaySinh").css("border-color", "#ced4da");
+                    }
+                },
+                error: function (req, status, error) {
+                    console.log(error);
 
+                }
+            });
+        }
+
+    });
+    $("#soDT").blur(function () {
+        var soDT = $("#soDT").val();
+        if (soDT == "") {
+            checkSoDT = false;
+            $("#ErrorMgsSoDT").text("Bạn bắt buộc phải nhập trường này!");
+            $("#SubmitBtn").prop("disabled", true);
+        }
+        else {
+            checkSoDT = true;
+            if (checkHoTen == true && checkDate == true && checkChucVu == true) {
+                $("#SubmitBtn").prop('disabled', false);
+            }
+            $("#ErrorMgsSoDT").text("");
+           
+        }
+    });
+    $("#chucVu").blur(function () {
+
+        var chucVu = $("#chucVu").val();
+        console.log(chucVu);
+        if (chucVu == "") {
+            console.log("Da den day");
+            checkChucVu = false;
+            $("#ErrorMgsChucVu").text("Bạn bắt buộc phải nhập trường này!");
+            $("#SubmitBtn").prop("disabled", true);
+        }
+        else {
+            checkChucVu = true;
+            if (checkHoTen == true && checkSoDT == true && checkDate == true) {
+                $("#SubmitBtn").prop('disabled', false);
+            }
+            $("#ErrorMgsChucVu").text("");
+         
+        }
+    });
+    $("#phongBan").mouseup(function () {
+        var phongBan = $("#phongBan").val();
+        if (phongBan == "Chọn phòng ban") {
+            $("#ErrorMgsPhongBan").text("Bạn bắt buộc phải chọn trường này!");
+            $("#SubmitBtn").prop("disabled", true);
+        }
+        else {
+            $("#SubmitBtn").prop('disabled', false);
+            $("#ErrorMgsPhongBan").text("");
+        }
+    });
+
+//Export Excel==================================================
+    $("#excelExport").click(function () {
+       
         $.ajax({
             type: "Post",
-            url: "/staff/IsDuplicatedStaff",
-            data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
+            url: "/staff/ExcelExport",
             dataType: "json",
             success: function (json) {
-                var a = json;
-                if (a == true) {
-                    $("#SubmitBtn").prop("disabled", true);
-                    $("#ErrorMgs").text("Nhân Viên Đã Tồn Tại");
-                    $("#hoTen").css("border-color", "red");
-                    $("#ngaySinh").css("border-color", "red");
-                }
-                if (a == false) {
-                    $("#SubmitBtn").prop('disabled', false);
-                    $("#CreateForm").unbind(event)
-                    $("#ErrorMgs").text("");
-                    $("#hoTen").css("border-color", "ced4da");
-                    $("#ngaySinh").css("border-color", "ced4da");
-                }
+                alert('Đã xuất file Excel thành công');
+                
+
             },
             error: function (req, status, error) {
                 console.log(error);
@@ -125,132 +241,9 @@ $(document).ready(function () {
         });
     });
 
-//sự kiện sửa nhân viên===============================================================
-    $(".click").click(function (event) {
-
-        event.preventDefault();
-        var temp = $(this).attr("id");
-        temp = temp.toString().substr(4, 1);
-        console.log(temp);
-
-      
-        $('#closeBtnEdit_' + temp).click(function (event) {
-            console.log("checkkkkkkk");
-            $("#editNV-" + temp).modal("hide");
-        });
-        
-
-        
-
-        $('#hoTen-' + temp).blur(function () {
-
-      
-            var maNhanVien = $('#maNV-' + temp).val();
-            var hoTen = $('#hoTen-' + temp).val();
-            var ngaySinh = $('#ngaySinh-' + temp).val();
-            var soDT = $('#soDT-' + temp).val();
-
-            var chucVu = $('#chucVu-' + temp).val();
-
-            $.ajax({
-                type: "Post",
-                url: "/staff/IsDuplicatedStaff",
-                data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
-                dataType: "json",
-                success: function (json) {
-                    var a = json;
-                    if (a == true) {
-                        $("#EditBtn-" + temp).prop("disabled", true);
-                        $('#errormesageHoTen-' + temp).text("Nhân Viên Đã Tồn Tại");
-                        $('#hoTen-' + temp).css("border-color", "red");
-                        $('#ngaySinh-' + temp).css("border-color", "red");
-                    }
-                    if (a == false) {
-                        $("#EditBtn-" + temp).prop('disabled', false);
-                        $('#errormesageHoTen-' + temp).text("");
-                        $('#hoTen-' + temp).css("border-color", "#ced4da");
-                        $('#ngaySinh-' + temp).css("border-color", "#eff1f3");
-                    }
-                },
-                error: function (req, status, error) {
-                    console.log(error);
-
-                }
-            });
-        });
-        $('#ngaySinh-' + temp).blur(function () {
-
-            $('#test').id;
-
-
-            var maNhanVien = $('#maNV-' + temp).val();
-            var hoTen = $('#hoTen-' + temp).val();
-            var ngaySinh = $('#ngaySinh-' + temp).val();
-            var soDT = $('#soDT-' + temp).val();
-
-            var chucVu = $('#chucVu-' + temp).val();    
-
-            $.ajax({
-                type: "Post",
-                url: "/staff/IsDuplicatedStaff",
-                data: { maNhanVien: maNhanVien, hoTen: hoTen, ngaySinh: ngaySinh, soDT: soDT, chucVu: chucVu },
-                dataType: "json",
-                success: function (json) {
-                    var a = json;
-                    if (a == true) {
-                        $("#EditBtn-" + temp).prop("disabled", true);
-                        $('#errormesageHoTen-'+ temp).text("Nhân Viên Đã Tồn Tại");
-                        $('#hoTen-' + temp).css("border-color", "red");
-                        $('#ngaySinh-' + temp).css("border-color", "red");
-                    }
-                    if (a == false) {
-                        $("#EditBtn-" + temp).prop('disabled', false);
-                        $('#errormesageHoTen-' + temp).text("");
-                        $('#hoTen-' + temp).css("border-color", "#ced4da");
-                        $('#ngaySinh-' + temp).css("border-color", "#eff1f3");
-                    }
-                },
-                error: function (req, status, error) {
-                    console.log(error);
-
-                }
-            });
-        });
-        
-    });
-    var modal = document.getElementById("myModal");
-
-
-    var btn = document.getElementById("myBtn");
-
-
-    var span = document.getElementsByClassName("closeBtnCreate")[0];
-
-
-
-
-    btn.onclick = function () {
-        modal.style.display = "block";
-    }
-
-
-    span.onclick = function () {
-        modal.style.display = "none";
-    }
-
-
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-
-    
-   
 });
 
 
-    // Get the modal
  
 
 
