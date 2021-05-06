@@ -1,96 +1,165 @@
-﻿@model List<WebNhanVien.Models.NhanVien>
-    @{
-        ViewBag.Title = "Danh sách nhân viên";
-    }
-    <div   style=" text-align: center;">
-        <h1>@ViewBag.Title</h1>
-    </div>
+﻿@model List<WebNhanVien.Models.PhongBan>
+@*@model WebNhanVien.Models.NhanVienModel*@
+
+
+@{
+    ViewData["Title"] = "Danh Sách Nhân Viên";
+    var currentPage = (string)@ViewBag.currentPage;
+    var pageNunber = (int)ViewBag.pageNumber;
+
+}
+<link href="~/css/Staffcss/test.css" rel="stylesheet" type="text/css" />
+
+<h1 style="text-align: center;">@ViewData["Title"]</h1>
+<div style="margin-bottom: 20px;">
 
 
 
+    <div style="display: -webkit-box;">
+        @*Phần popup tạo nhân viên--------------------------------------------------------*@
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <title>Bootstrap Example</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    </head>
-    <body>
 
-        <div class="container">
-            <div >
-                <form asp-action="index" method="post" asp-controller="Staff" class="input-group">
-                    <input name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search"
-                           aria-describedby="search-addon" />
-                    <button type="submit" class="btn btn-outline-primary" style=" border: 1px solid #00ff90; color: #ffffff; background-color: #00ff90; text-align: center;margin-top: 27px;left: 49%; right: 50%;  position: relative; transform: translate(-50%, -50%);">Tìm</button>
-                </form>
 
+        <!-- Trigger/Open The Modal -->
+        <button class="btn btn-outline-success btnCreate" id="myBtn">Thêm nhân viên</button>
+
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
+
+            <!-- Modal content -->
+            <div class="modal-content" style=" position: relative; top: 18%; max-width: 60%; margin: auto; min-height: 30%; background-color: #fefefe; width: 100%; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s; -webkit-animation-name: slideIn; -webkit-animation-duration: 0.4s; animation-name: slideIn; animation-duration: 0.4s;">
+                <div class="modal-header" style=" padding: 2px 16px; background-color: #5cb85c; color: white; text-align: center;display: block;">
+                    <span class="closeBtnCreate">&times;</span>
+                    <h2 style="padding: 15px;">Thêm hồ sơ nhân viên mới</h2>
+                </div>
+                <div class="modal-body" style="padding: 2px 16px;">
+
+                    <form style="display: grid; margin: 20px;" action="/staff/CreateNV" method="post">
+                        @{
+                            var maNV = ViewBag.maNV;
+                        }
+
+                        @using (Html.BeginForm())
+                        {
+
+                            <label type="text" name="maNhanVien">Mã nhân viên</label>
+                            <input style="margin-bottom: 15px;" type="text" name="maNhanVien" id="maNhanVien" value=@maNV disabled />
+                            <input name="maNhanVien" value="@maNV" hidden />
+
+                            <label type="text" name="hoTen">Họ và tên</label>
+                            <input style="margin-bottom: 15px;" type="text" name="hoTen" id="hoTen" />
+                            <span id="ErrorMgs" class="text-danger"></span>
+
+
+                            <label type="date" name="ngaySinh">Ngày sinh</label>
+                            <input style="margin-bottom: 15px;" name="ngaySinh" type="date" id="ngaySinh" />
+                            <span id="ErrorMgsDate" class="text-danger"></span>
+
+                            <label type="text" name="soDT">Số điện thoại</label>
+                            <input style="margin-bottom: 15px;" type="text" name="soDT" id="soDT" />
+                            <span id="ErrorMgsSoDT" class="text-danger"></span>
+
+                            <label type="text" name="diaChi">Địa chỉ</label>
+                            <input style="margin-bottom: 15px;" type="text" name="diaChi" id="diaChi" />
+                            <span id="ErrorMgsDiaChi" class="text-danger"></span>
+
+                            <label type="text" name="chucVu">Chức vụ</label>
+                            <input style="margin-bottom: 15px;" type="text" name="chucVu" id="chucVu" />
+                            <span id="ErrorMgsChucVu" class="text-danger"></span>
+
+                            <label type="text" name="chucVu">Phòng ban</label>
+                            <select id="phongBan" name="ten_phong_ban" class="form-select " aria-label="Default select example">
+                                <option selected id="0">Chọn phòng ban</option>
+                                @foreach (PhongBan pb in Model)
+                                {
+                                    <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
+                                }
+                            </select>
+                            <span id="ErrorMgsPhongBan" class="text-danger"></span>
+
+                            <input style="margin: 20px 0px;" type="submit" id="SubmitBtn" class="btn btn-success" value="Thêm mới" />
+
+
+                        }
+                    </form>
+                </div>
+                <div class="modal-footer" style="padding: 20px 16px; background-color: #5cb85c; color: #2da949f7; }">
+
+                </div>
             </div>
-               
 
-
-        <a style="margin: 10px 0;" class="btn btn-success" href="/Staff/Create">Thêm mới</a>
-        <a style="margin: 10px 0px 0px 949px; position: absolute;" class="btn btn-success" href="/Staff/Reup">Trở Lại</a>
-
-
-        <table class="table table-bordered">
-            <thead>
-                <tr style="background-color: #00ff90">
-                    <th>Mã nhân viên</th>
-                    <th>Họ và tên</th>
-                    <th>Ngày sinh</th>
-                    <th>SĐT</th>
-                    <th>Chức vụ</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.maNV</td>
-                        <td>@item.hoTen</td>
-                        <td>@item.ngaySinh.ToShortDateString()</td>
-                        <td>@item.soDT</td>
-                        <td>@item.chucVu</td>
-                        <td>
-                            <a class="btn btn-info" href="/Staff/Edit/@item.maNV">Sửa</a>
-
-                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#NV-@Model.IndexOf(item)">Xóa</button>
-                            <div class="modal" id="NV-@Model.IndexOf(item)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <i class='fas fa-exclamation-triangle'></i>
-                                            <h5 class="modal-title">Bạn Có Chắc Muốn Xóa</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="Huy-@item.maNV">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Nhân Viên <span style="color:red">@item.hoTen</span>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                                            <a class="btn btn-primary" href="/Staff/Delete/@item.maNV">Xóa</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                }
-
-            </tbody>
-        </table>
         </div>
 
-    </body>
-    </html>
+        <form asp-action="index" method="post" asp-controller="Staff" class="input-group" style="margin-bottom: 20px;margin-left: 20px;max-width: 83%;">
 
+
+            <input id="SearchBox" style=" max-width: 86%;" name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search"
+                   aria-describedby="search-addon" />
+        </form>
+
+        <button style="position: absolute;margin-left: 966px;" class="btn btn btn-outline-success float-right" id="excelExport"><i class="fas fa-file-excel"></i> Xuất File Excel</button>
+    </div>
+    <div style="display: flex;  ">
+        
+        <div class="btn btn-dark">Phòng ban:</div>
+        <div style=" margin-left: 10px;">
+            <select id="check" class="form-select btn-dark btn" aria-label="Default select example">
+                <option selected id="0">Tất Cả</option>
+                @foreach (PhongBan pb in Model)
+                {
+                    <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
+                }
+            </select>
+        </div>
+    </div>
+
+</div>
+
+
+
+<table class="table  table-dark table-striped">
+    <thead>
+        <tr>
+            <th>
+                Mã nhân viên
+            </th>
+            <th>
+                Họ Tên
+            </th>
+            <th>
+                Ngày Sinh
+            </th>
+            <th>
+                Số điện thoại
+            </th>
+            <th>
+                Địa Chỉ
+            </th>
+            <th>
+                Chức vụ
+            </th>
+            <th>
+                Phòng ban
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody id="StaffTable">
+       
+    </tbody>
+</table>
+<div id="pagenav">
+    
+</div>
+
+
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/index.js"></script>
+}
 
