@@ -234,8 +234,8 @@ namespace WebNhanVien.Controllers
 
      
         [HttpPost]
-           public async Task<IActionResult> Import(IFormFile file)
-                {
+        public async Task<IActionResult> Import(IFormFile file)
+        {
                     var list = new List<NhanVien>();
                     using (var stream = new MemoryStream())
                     {
@@ -247,6 +247,10 @@ namespace WebNhanVien.Controllers
                             var rowcount = worksheet.Dimension.Rows;
                             for(int row = 2 ; row<rowcount+1 ; row++)
                             {
+                                var dateString = worksheet.Cells[row, 3].Value;
+                                /*var check = typeof(dateString);*/
+                               
+                                var tempDate = worksheet.Cells[row, 3].Value.ToString().Trim();
                                 var tempID = (double)worksheet.Cells[row, 7].Value;
                                 list.Add(new NhanVien
                                 {
@@ -264,7 +268,7 @@ namespace WebNhanVien.Controllers
                     }
                     DBHelper.UpDateExcel(list);
                     return Redirect("/staff/index"); 
-                }
+        }
         
         public IActionResult Export()
         {
