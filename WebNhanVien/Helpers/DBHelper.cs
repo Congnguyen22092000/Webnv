@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using WebNhanVien.Models;
 using OfficeOpenXml;
 using System.IO;
+using OfficeOpenXml.Style;
+using System.Drawing;
+using ClosedXML.Excel;
 
 namespace WebNhanVien.Helpers
 {
@@ -14,8 +17,12 @@ namespace WebNhanVien.Helpers
     {
         private static readonly string connectionString = "HOST=127.0.0.1;Username=postgres;Password=cong2209;Database=CongData";
         
-        public static List<NhanVien> Get(string keyPhongBan =  "Tất Cả",string keyBox = "")
+        public static List<NhanVien> Get(string keyPhongBan =  "",string keyBox = "")
         {
+            if (keyPhongBan == "")
+            {
+                keyPhongBan = "Tất Cả";
+            }
             IEnumerable<NhanVien> nhanvien = null;
             using (var connection = new NpgsqlConnection(connectionString))
             {
@@ -48,6 +55,7 @@ namespace WebNhanVien.Helpers
                         }
                         else
                         {
+                            
                             if (searchPhongBan(keyPhongBan) == 0)
                             {
                                 nhanvien = null;
@@ -100,6 +108,23 @@ namespace WebNhanVien.Helpers
             }
 
             return x;
+        }
+        public static bool checkPhongBan(string name)
+        {
+            IEnumerable<PhongBan> phongban = null;
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                phongban = connection.Query<PhongBan>("SELECT * from \"phong_ban\" order by \"id\" ASC");
+            }
+            var tempList = phongban.ToList();   
+            foreach(PhongBan pb in tempList)
+            {
+                if(pb.ten_phong_ban == name)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static List<PhongBan> GetPhongBan(string key = null)
@@ -210,46 +235,81 @@ namespace WebNhanVien.Helpers
             }
         }
         //Export Excel===============================================
-        public static bool Export(List<NhanVien> ds = null)
+        public static Stream Export(List<NhanVien> data = null)
         {
-            FileInfo file = new FileInfo(@"wwwroot\data\cong.xlsx");
-            if (file.Exists)
+
+            var stream = new MemoryStream();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage(stream))
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                using (var excelPackage = new ExcelPackage(file))
+
+
+                var excelWorkSheet = package.Workbook.Worksheets.Add("Nhan_Vien");
+                //Do du lieu
+                /*sheet.Cells.LoadFromCollection(data, true);
+                package.Save();*/
+
+                excelWorkSheet.Cells["A1"].Value = "Mã Nhân Viên";
+
+                excelWorkSheet.Cells["B1"].Value = "Họ Tên";
+                excelWorkSheet.Cells["C1"].Value = "Ngày Sinh";
+                excelWorkSheet.Cells["D1"].Value = "Số Điện Thoại";
+                excelWorkSheet.Cells["E1"].Value = "Địa Chỉ";
+                excelWorkSheet.Cells["F1"].Value = "Chức Vụ";
+                excelWorkSheet.Cells["G1"].Value = "Phong Ban ID";
+                excelWorkSheet.Cells["H1"].Value = "Tên Phòng Ban";
+                excelWorkSheet.Cells["A2"].LoadFromCollection(data);
+                excelWorkSheet.Cells["C2:C" + (data.Count + 1).ToString()].Style.Numberformat.Format = "dd-MM-yyyy";
+                //set boder----------------------------------------------------------------
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.Font.Size = 12;
+                excelWorkSheet.Cells["A1:H1"].Style.Font.Color.SetColor(Color.White);
+                excelWorkSheet.Cells["A1:H1"].Style.Font.Bold = true;
+                excelWorkSheet.Cells["A1:H1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                excelWorkSheet.Cells["A1:H1"].Style.Fill.BackgroundColor.SetColor(Color.Green);
+
+                // excelWorkSheet.Cells["A1:H1"].Style.GetT.SetColor(Color.Green);
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Top.Style = ExcelBorderStyle.Thick;
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Left.Style = ExcelBorderStyle.Thick;
+                //Set style and color------------------------------------------------------
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Top.Style = ExcelBorderStyle.Double;
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Bottom.Style = ExcelBorderStyle.Double;
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Top.Color.SetColor(Color.Purple);
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Bottom.Color.SetColor(Color.Purple);
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Right.Style = ExcelBorderStyle.Double;
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Left.Style = ExcelBorderStyle.Double;
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Right.Color.SetColor(Color.Purple);
+                excelWorkSheet.Cells["A2:H" + (data.Count + 1).ToString()].Style.Border.Left.Color.SetColor(Color.Purple);
+                double minimumSize = 15;
+                excelWorkSheet.Cells[excelWorkSheet.Dimension.Address].AutoFitColumns(minimumSize);
+
+                double maximumSize = 100;
+                excelWorkSheet.Cells[excelWorkSheet.Dimension.Address].AutoFitColumns(minimumSize, maximumSize);
+                double rowHeight = 15;
+                for (int row = 1; row <= data.Count + 1; row++)
                 {
-                    excelPackage.Workbook.Properties.Author = "Công";
-                    excelPackage.Workbook.Properties.Title = "Staff List";
-                    excelPackage.Workbook.Properties.Created = DateTime.Now;
-
-                    var excelWorkSheet = excelPackage.Workbook.Worksheets["Sheet1"];
-
-                    excelWorkSheet.Cells["A2"].LoadFromCollection(ds);
-
-                   
-                    excelPackage.SaveAs(file);
-
+                    excelWorkSheet.Row(row).Height = rowHeight;
                 }
-            }
-            else
-            {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                using (var excelPackage = new ExcelPackage())
+
+                for (int col = 1; col <= excelWorkSheet.Dimension.End.Column; col++)
                 {
-                    excelPackage.Workbook.Properties.Author = "Công";
-                    excelPackage.Workbook.Properties.Title = "Staff List";
-                    excelPackage.Workbook.Properties.Created = DateTime.Now;
-
-                    var excelWorkSheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
-
-                    excelWorkSheet.Cells["A1"].LoadFromCollection(ds);
-                    excelPackage.SaveAs(file);
-
+                    excelWorkSheet.Column(col).Width = excelWorkSheet.Column(col).Width + 1;
                 }
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                excelWorkSheet.Cells["B2:B" + (data.Count + 1).ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                excelWorkSheet.Cells["E2:E" + (data.Count + 1).ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.WrapText = true;
+                excelWorkSheet.Column(7).Hidden = true;
+                package.Save();
             }
+            return stream;
 
-            return true;
+
+            
+
+
         }
-
     }
 }

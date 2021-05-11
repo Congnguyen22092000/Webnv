@@ -5,7 +5,7 @@
 @{
     ViewData["Title"] = "Danh Sách Nhân Viên";
     var currentPage = (string)@ViewBag.currentPage;
-    var pageNunber = (int)ViewBag.pageNumber;
+    var pageNumber = (int)@ViewBag.pageNumber;
 
 }
 <link href="~/css/Staffcss/test.css" rel="stylesheet" type="text/css" />
@@ -69,12 +69,9 @@
                             <span id="ErrorMgsChucVu" class="text-danger"></span>
 
                             <label type="text" name="chucVu">Phòng ban</label>
-                            <select id="phongBan" name="ten_phong_ban" class="form-select " aria-label="Default select example">
-                                <option selected id="0">Chọn phòng ban</option>
-                                @foreach (PhongBan pb in Model)
-                                {
-                                    <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
-                                }
+                            <select id="phongBan" name="ten_phong_ban" class="form-select " >
+                                
+                                
                             </select>
                             <span id="ErrorMgsPhongBan" class="text-danger"></span>
 
@@ -97,8 +94,10 @@
             <input id="SearchBox" style=" max-width: 86%;" name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search"
                    aria-describedby="search-addon" />
         </form>
-
+        @*xuat file excel============================================================*@
         <button style="position: absolute;margin-left: 966px;" class="btn btn btn-outline-success float-right" id="excelExport"><i class="fas fa-file-excel"></i> Xuất File Excel</button>
+    
+    
     </div>
     <div style="display: flex;  ">
         
@@ -153,6 +152,7 @@
 <div id="pagenav">
     
 </div>
+
 
 
 

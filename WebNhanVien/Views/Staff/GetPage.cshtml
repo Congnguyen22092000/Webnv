@@ -7,6 +7,8 @@
     var itemPerPage = ViewBag.itemPerPage;
     var pageIndex = ViewBag.pageIndex;
     var pageNunber = (int)Model.Count / itemPerPage;
+    var keyPhongBan = ViewBag.phongBan;
+    var keyBox = ViewBag.box;
 
 }
 
@@ -91,15 +93,15 @@
 
 
                                 <label type="text" name="chucVu">Phòng ban</label>
-                                <select    name="ten_phong_ban" style="margin:0px 0px 20px 0px;" class="form-select " aria-label="Default select example">
-                                    <option selected >@Model[i].ten_phong_ban</option>
+                                <select name="ten_phong_ban" style="margin:0px 0px 20px 0px;" class="form-select " aria-label="Default select example">
+                                    <option selected>@Model[i].ten_phong_ban</option>
                                     @foreach (PhongBan pb in dsPhongBan)
                                     {
-                                        if(@pb.ten_phong_ban != @Model[i].ten_phong_ban)
-                                            {
-                                                <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
-                                            }
-                                        
+                                        if (@pb.ten_phong_ban != @Model[i].ten_phong_ban)
+                                        {
+                                            <option id="phongban-@pb.id">@pb.ten_phong_ban</option>
+                                        }
+
                                     }
                                 </select>
 
@@ -163,6 +165,7 @@
     </tr>
 
 }
+
 <input type="number" id="pageNumber" value="@pageNunber" hidden />
 
 @section Scripts {

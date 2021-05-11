@@ -1,9 +1,11 @@
 ﻿$(document).ready(function () {
     var keyBox = $("#keyBox").val();
     var keyPhongBan = $("#keyPhongBan").val();
+    console.log("keyPhongBan o pagenav= " + keyPhongBan);
+    console.log("so trang= " + parseInt($("#TemppageNumber").val()));
+    console.log("so trang theo curent= " + parseInt($("#currentPage").val().substring(2)));
     
-    
-    for (var i = parseInt($("#pageNumber").val()); i > 0; i--) {
+    for (var i = parseInt($("#TemppageNumber").val()); i > 0; i--) {
         var li = "<li class='page-item' id='p-" + (i ).toString() + "'><button class='page-link'>" + (i ).toString() + "</button></li>";
         $("#startList").after(li);
     }
@@ -108,7 +110,7 @@
        
             $("#endList").addClass("disabled");
             $("#startList").removeClass("disabled");
-      
+       
         $.ajax({
             type: "Post",
             url: "/staff/GetPage",

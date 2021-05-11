@@ -1,5 +1,6 @@
 ﻿
 $(document).ready(function () {
+    
     var searchBox = $("#SearchBox").val().toLowerCase();
     var searchPhongBan = $("#check").val();
     //Gọi trang đầu===========================================================
@@ -13,6 +14,7 @@ $(document).ready(function () {
         success: function (data) {
 
             $("#pagenav").html(data);
+            
         },
         error: function (req, status, error) {
             console.log(error);
@@ -26,7 +28,7 @@ $(document).ready(function () {
         
         searchBox = $("#SearchBox").val().toLowerCase();
         searchPhongBan = $("#check").val();
-        
+        console.log(searchPhongBan);
         $.ajax({
             type: "Post",
             url: "/staff/PageNav",
@@ -45,10 +47,9 @@ $(document).ready(function () {
 
     //Sự kiện tìm kiếm====================================================
     $("#SearchBox").on("keyup", function () {
-         searchBox = $("#SearchBox").val().toLowerCase();
+        searchBox = $("#SearchBox").val().toLowerCase();
         searchPhongBan = $("#check").val();
-        console.log("check index");
-        console.log(searchBox);
+        
         
         $.ajax({
             type: "Post",
@@ -56,7 +57,7 @@ $(document).ready(function () {
             data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
             dataType: "text",
             success: function (data) {
-                /*$("#StaffTable").empty();*/
+               
                 $("#pagenav").html(data);
             },
             error: function (req, status, error) {
@@ -73,6 +74,31 @@ $(document).ready(function () {
     var checkSoDT = false;
     var checkChucVu = false;
     
+    $("#myBtn").click(function () {
+        var outPhongBan = $("#check").val();
+        console.log(outPhongBan);
+        $.ajax({
+            type: "Post",
+            url: "/staff/phongBan",
+            data: { name: outPhongBan},
+            dataType: "text",
+            success: function (data) {
+
+                
+                $("#phongBan").html(data);
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+        
+       
+        /*$("#" + temp).addClass("selected");*/
+
+    });
+
+
 
     $("#hoTen").blur(function () {
 
@@ -224,18 +250,19 @@ $(document).ready(function () {
 
 //Export Excel==================================================
     $("#excelExport").click(function () {
-       
+        console.log(searchPhongBan);
         $.ajax({
-            type: "Post",
-            url: "/staff/ExcelExport",
-            dataType: "json",
-            success: function (json) {
-                alert('Đã xuất file Excel thành công');
+            type: "post",
+            url: "/staff/Export",
+            
+            success: function () {
                 
-
+                window.location = "/staff/Export";
+                
             },
             error: function (req, status, error) {
                 console.log(error);
+                
 
             }
         });

@@ -10,7 +10,7 @@ $(document).ready(function () {
 
     $(".delBtn").click(function () {
         
-
+        
         var MaNhanVien = $(this).attr("id");
         $("#NV-" + MaNhanVien).modal('toggle');
         $(".modal-backdrop").remove();
@@ -28,7 +28,7 @@ $(document).ready(function () {
                 $.ajax({
                     type: "Post",
                     url: "/staff/pagenav",
-                    data: { currentPage: delCurrentPage },
+                    data: { currentPage: delCurrentPage, keyBox: "",keyPhongBan: "Tất Cả" },
                     dataType: "text",
                     success: function (data) {
                         $("#pagenav").html(data);

@@ -2,21 +2,28 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using WebNhanVien.Helpers;
 using WebNhanVien.Models;
 
+
+
 namespace WebNhanVien.Controllers
 {
-  
+    
 
     public class StaffController : Controller
     {
         
-
+        
         public SessionHelper SessionHelper = new SessionHelper();
         private int itemPerPage = 6;
         private string currentPage = "p-1";
@@ -152,19 +159,7 @@ namespace WebNhanVien.Controllers
             return result;
         }
 
-        //Lien quan toi page----------------------
-        //Tim kiem===============================
-        [HttpPost]
-        public IActionResult Search(string keyPhongBan = "", string keyBox = "")
-        {
-            List<NhanVien> dsTim = DBHelper.Get(keyPhongBan, keyBox);
-            ViewBag.itemPerPage = itemPerPage;
-            if (keyBox == "")
-            {
-                return View(DBHelper.Get());
-            }
-            return View(DBHelper.Get(keyPhongBan, keyBox));
-        }
+       
         [HttpGet]
         public ActionResult PageNav()
         {
@@ -184,7 +179,7 @@ namespace WebNhanVien.Controllers
             {
                 ViewBag.currentPage = currentPage;
             }
-            if((int)DBHelper.Get().Count % itemPerPage == 0)
+            if ((int)DBHelper.Get(keyPhongBan, keyBox).Count % itemPerPage == 0)
             {
                 ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage;
             }
@@ -199,9 +194,13 @@ namespace WebNhanVien.Controllers
         [HttpPost]
         public IActionResult GetPage(int pageIndex, string keyPhongBan = "", string keyBox = "")
         {
+            HttpContext.Session.SetString("keyPhongBanSS", JsonConvert.SerializeObject(keyPhongBan));
+            HttpContext.Session.SetString("keyBoxSS", JsonConvert.SerializeObject(keyBox));
             ViewBag.dsPhongban = DBHelper.GetPhongBan();
             ViewBag.pageIndex = pageIndex;
             ViewBag.itemPerPage = itemPerPage;
+            ViewBag.phongBan = keyPhongBan;
+            ViewBag.box = keyBox;
             return View(DBHelper.Get(keyPhongBan, keyBox));
         }
 
@@ -232,13 +231,28 @@ namespace WebNhanVien.Controllers
             return daTonTai;
         }
 
-        [HttpPost]
-        public bool ExcelExport()
+      /*  [HttpPost]
+        public bool ExcelExport( string keyPhongBan, string keyBox)
         {
-            DBHelper.Export(DBHelper.Get());
+            *//*DBHelper.Export(DBHelper.Get(keyPhongBan, keyBox));*//*
+            Export();
             return true;
+        }*/
+        
+       
+        
+        public IActionResult Export()
+        {
+            var tempPhongBan = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("keyPhongBanSS"));
+            var tempBox = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("keyBoxSS"));
+            var data = DBHelper.Get(tempPhongBan, tempBox).ToList();
+            /*var stream = new MemoryStream();*/
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var stream = DBHelper.Export(data);
+            var nameFile = "PB-" + tempPhongBan + ".xlsx";
+            stream.Position = 0;
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nameFile);
         }
-
 
         [HttpPost]
         public bool checkPhongban()
@@ -253,6 +267,12 @@ namespace WebNhanVien.Controllers
             return View();
         }
 
+        [HttpPost]
+        public ActionResult phongBan(string name="")
+        {
+            ViewBag.Name = name;
+            return View(DBHelper.GetPhongBan());
+        }
 
     }
 }
