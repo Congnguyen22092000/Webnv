@@ -10,6 +10,7 @@ using System.IO;
 using OfficeOpenXml.Style;
 using System.Drawing;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 
 namespace WebNhanVien.Helpers
 {
@@ -218,11 +219,32 @@ namespace WebNhanVien.Helpers
 
         public static void Update(NhanVien nv)
         {
-            using (var connection = new NpgsqlConnection(connectionString))
+            var tempList = Get("", "");
+            var checkTonTai = false;
+            foreach(NhanVien NV in tempList)
             {
-                connection.Open();
-                connection.Execute("Update \"Cong_Data\" SET  \"hoTen\" = @hoTen ,\"ngaySinh\" = @ngaySinh, \"soDT\" = @soDT,\"diaChi\" = @diaChi,\"chucVu\" = @chucVu,\"phong_ban_id\" = @phong_ban_id WHERE \"maNhanVien\" = @maNhanVien", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu,nv.phong_ban_id });
+                if (NV.maNhanVien == nv.maNhanVien)
+                {
+                    checkTonTai = true;
+                }
+            }
+            if (checkTonTai == true)
+            {
+                using (var connection = new NpgsqlConnection(connectionString))
+                {
+                    connection.Open();
+                    connection.Execute("Update \"Cong_Data\" SET  \"hoTen\" = @hoTen ,\"ngaySinh\" = @ngaySinh, \"soDT\" = @soDT,\"diaChi\" = @diaChi,\"chucVu\" = @chucVu,\"phong_ban_id\" = @phong_ban_id WHERE \"maNhanVien\" = @maNhanVien", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id });
 
+                }
+            }
+            else
+            {
+                using (var connection = new NpgsqlConnection(connectionString))
+                {
+                    connection.Open();
+                    connection.Execute("insert into \"Cong_Data\"(\"maNhanVien\",\"hoTen\",\"ngaySinh\",\"soDT\",\"diaChi\",\"chucVu\",\"phong_ban_id\") values(@maNhanVien,@hoTen,@ngaySinh,@soDT,@diaChi,@chucVu,@phong_ban_id)", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id });
+
+                }
             }
         }
         public static void Delete(string maNhanVien)
@@ -244,7 +266,7 @@ namespace WebNhanVien.Helpers
             {
 
 
-                var excelWorkSheet = package.Workbook.Worksheets.Add("Nhan_Vien");
+                var excelWorkSheet = package.Workbook.Worksheets.Add("Sheet1");
                 //Do du lieu
                 /*sheet.Cells.LoadFromCollection(data, true);
                 package.Save();*/
@@ -259,7 +281,8 @@ namespace WebNhanVien.Helpers
                 excelWorkSheet.Cells["G1"].Value = "Phong Ban ID";
                 excelWorkSheet.Cells["H1"].Value = "Tên Phòng Ban";
                 excelWorkSheet.Cells["A2"].LoadFromCollection(data);
-                excelWorkSheet.Cells["C2:C" + (data.Count + 1).ToString()].Style.Numberformat.Format = "dd-MM-yyyy";
+                excelWorkSheet.Cells["C2:C" + (data.Count + 1).ToString()].Style.Numberformat.Format = "dd/MM/yyyy";
+    
                 //set boder----------------------------------------------------------------
                 excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.Font.Size = 12;
                 excelWorkSheet.Cells["A1:H1"].Style.Font.Color.SetColor(Color.White);
@@ -307,9 +330,37 @@ namespace WebNhanVien.Helpers
             return stream;
 
 
-            
 
 
+        }
+
+        public static void UpDateExcel(List<NhanVien> nv)
+        {
+            var listGoc = Get("","");
+            var listMoi = nv;
+            for(int i = 0; i< listMoi.Count; i++)
+            {
+                bool checkTrung = true;
+                for(int j= 0;j < listGoc.Count; j++)
+                {
+                    if (listMoi[i].maNhanVien == listGoc[j].maNhanVien)
+                    {
+                        checkTrung= false;
+                        listGoc[j] = listMoi[i];
+                        break;
+                    }
+                    
+                }
+                if (checkTrung == true)
+                {
+                    listGoc.Add(listMoi[i]);
+                }
+            }
+            var temp = listGoc;
+            foreach(NhanVien nhanvien in listGoc)
+            {
+                Update(nhanvien);
+            }
         }
     }
 }

@@ -247,7 +247,38 @@ $(document).ready(function () {
             $("#ErrorMgsPhongBan").text("");
         }
     });
+//Import Excel==================================================
+    $("#ImportExcel").click(function () {
+        console.log("day la import");
+        $.ajax({
+            type: "post",
+            url: "/staff/Import",
 
+            success: function () {
+                $.ajax({
+                    type: "Post",
+                    url: "/staff/PageNav",
+                    data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+                    dataType: "text",
+                    success: function (data) {
+
+                        $("#pagenav").html(data);
+
+                    },
+                    error: function (req, status, error) {
+                        console.log(error);
+
+                    }
+                });
+
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+
+            }
+        });
+    });
 //Export Excel==================================================
     $("#excelExport").click(function () {
         console.log(searchPhongBan);

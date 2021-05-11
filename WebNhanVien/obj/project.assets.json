@@ -9308,11 +9308,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\WebNhanVien\\WebNhanVien\\WebNhanVien.csproj",
+      "projectUniqueName": "D:\\tempGit\\Webnv\\WebNhanVien\\WebNhanVien.csproj",
       "projectName": "WebNhanVien",
-      "projectPath": "D:\\WebNhanVien\\WebNhanVien\\WebNhanVien.csproj",
+      "projectPath": "D:\\tempGit\\Webnv\\WebNhanVien\\WebNhanVien.csproj",
       "packagesPath": "C:\\Users\\thiet\\.nuget\\packages\\",
-      "outputPath": "D:\\WebNhanVien\\WebNhanVien\\obj\\",
+      "outputPath": "D:\\tempGit\\Webnv\\WebNhanVien\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\thiet\\AppData\\Roaming\\NuGet\\NuGet.Config",

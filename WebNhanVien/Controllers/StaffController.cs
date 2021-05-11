@@ -7,6 +7,7 @@ using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace WebNhanVien.Controllers
         {
 
             float temp = DBHelper.GetCount() + 1;
-            if (temp > 10 )
+            if (temp >= 10 )
             {
                 ViewBag.maNV = "NV-00" +  temp.ToString() ;
             }
@@ -231,15 +232,39 @@ namespace WebNhanVien.Controllers
             return daTonTai;
         }
 
-      /*  [HttpPost]
-        public bool ExcelExport( string keyPhongBan, string keyBox)
-        {
-            *//*DBHelper.Export(DBHelper.Get(keyPhongBan, keyBox));*//*
-            Export();
-            return true;
-        }*/
-        
-       
+     
+        [HttpPost]
+           public async Task<IActionResult> Import(IFormFile file)
+                {
+                    var list = new List<NhanVien>();
+                    using (var stream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(stream);
+                        using(var package = new ExcelPackage(stream))
+                        {
+                            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                            var rowcount = worksheet.Dimension.Rows;
+                            for(int row = 2 ; row<rowcount+1 ; row++)
+                            {
+                                var tempID = (double)worksheet.Cells[row, 7].Value;
+                                list.Add(new NhanVien
+                                {
+                                    maNhanVien = worksheet.Cells[row, 1].Value.ToString().Trim(),
+                                    hoTen = worksheet.Cells[row, 2].Value.ToString().Trim(),
+                                    ngaySinh = (DateTime)worksheet.Cells[row, 3].Value,
+                                    soDT = worksheet.Cells[row, 4].Value.ToString().Trim(),
+                                    diaChi = worksheet.Cells[row, 5].Value.ToString().Trim(),
+                                    chucVu = worksheet.Cells[row, 6].Value.ToString().Trim(),
+                                    phong_ban_id = (int)tempID,
+                                    ten_phong_ban = worksheet.Cells[row, 8].Value.ToString().Trim()
+                                });
+                            }
+                        }
+                    }
+                    DBHelper.UpDateExcel(list);
+                    return Redirect("/staff/index"); 
+                }
         
         public IActionResult Export()
         {
