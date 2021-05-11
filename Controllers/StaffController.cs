@@ -39,14 +39,14 @@ namespace WebNhanVien.Controllers
                 ViewBag.maNV = "NV-000" + temp.ToString();
             }
 
-            if ((int)DBHelper.Get().Count % itemPerPage == 0)
+            /*if ((int)DBHelper.Get().Count % itemPerPage == 0)
             {
                 ViewBag.currentPage = "p-" + (int)DBHelper.Get().Count / itemPerPage;
             }
             else
             {
                 ViewBag.currentPage = currentPage;
-            }
+            }*/
             ViewBag.pageNumber = (int)DBHelper.Get().Count / itemPerPage;
 
            
@@ -152,19 +152,7 @@ namespace WebNhanVien.Controllers
             return result;
         }
 
-        //Lien quan toi page----------------------
-        //Tim kiem===============================
-        [HttpPost]
-        public IActionResult Search(string keyPhongBan = "", string keyBox = "")
-        {
-            List<NhanVien> dsTim = DBHelper.Get(keyPhongBan, keyBox);
-            ViewBag.itemPerPage = itemPerPage;
-            if (keyBox == "")
-            {
-                return View(DBHelper.Get());
-            }
-            return View(DBHelper.Get(keyPhongBan, keyBox));
-        }
+       
         [HttpGet]
         public ActionResult PageNav()
         {
@@ -172,26 +160,29 @@ namespace WebNhanVien.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult PageNav(string currentPage = "p-1",string keyPhongBan="",string keyBox="")
+        public IActionResult PageNav(int pageNumber = 1,string keyPhongBan="",string keyBox="")
         {
             ViewBag.keyBox = keyBox;
             ViewBag.keyPhongBan = keyPhongBan;
-            if ((int)DBHelper.Get().Count % itemPerPage == 0)
+            
+                if ((int)DBHelper.Get(keyPhongBan, keyBox).Count % itemPerPage == 0)
+                {
+                    ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage;
+                }
+                else
+                {
+                    ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage + 1;
+                }
+            
+            /*if ((int)DBHelper.Get().Count % itemPerPage == 0)
             {
                 ViewBag.currentPage = "p-" + (int)DBHelper.Get().Count / itemPerPage;
             }
             else
             {
                 ViewBag.currentPage = currentPage;
-            }
-            if((int)DBHelper.Get().Count % itemPerPage == 0)
-            {
-                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage;
-            }
-            else
-            {
-                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage + 1;
-            }
+            }*/
+            
             
 
             return View();

@@ -1,14 +1,16 @@
 ﻿$(document).ready(function () {
     var keyBox = $("#keyBox").val();
     var keyPhongBan = $("#keyPhongBan").val();
-    
+   
     
     for (var i = parseInt($("#pageNumber").val()); i > 0; i--) {
-        var li = "<li class='page-item' id='p-" + (i ).toString() + "'><button class='page-link'>" + (i ).toString() + "</button></li>";
+        var li = "<li class='page-item' id='" + (i).toString() + "'><button class='page-link'>" + (i ).toString() + "</button></li>";
         $("#startList").after(li);
     }
-    var currentPage = $("#currentPage").val();
-    var value = parseInt(currentPage.substring(2)) - 1;
+    var pageNumberCheck = $("#pageNumber").val();
+    var pageNumber = $("#pageNumber").val();
+    var value = parseInt($("#pageNumber").val());
+    console.log(value);
     if (parseInt($("#pageNumber").val()) == 1) {
         $("#startList").addClass("disabled");
         $("#endList").addClass("disabled");
@@ -22,7 +24,7 @@
     $.ajax({
         type: "Post",
         url: "/staff/GetPage",
-        data: { pageIndex: parseInt(value), keyPhongBan: keyPhongBan, keyBox: keyBox  },
+        data: { pageIndex: value, keyPhongBan: keyPhongBan, keyBox: keyBox  },
         dataType: "text",
         success: function (data) {
             $("#StaffTable").html(data);
@@ -33,20 +35,24 @@
         }
     });
 
-    $("#" + currentPage + " button").addClass("bg-primary text-white active");
+    $("#" + pageNumber + " button").addClass("bg-primary text-white active");
 
     $("li button").click(function () {
-        $("#" + currentPage + " button").removeClass("bg-primary text-white active");
-        currentPage = $(this).parent().attr("id");
+        pageNumber = $(this).parent().attr("id");
+       
+        
+        $("button").removeClass("bg-primary text-white active");
+        
+        
         $(this).addClass("bg-primary text-white active");
-        var pageIndex = parseInt(currentPage.substring(2)) - 1;
-        console.log($("#pageNumber").val());
-        console.log(pageIndex);
-        if (pageIndex == 0) {
+        var pageIndex = parseInt(pageNumber);
+       
+        console.log("pageIndex " + pageIndex);
+        if (pageIndex == 1) {
             $("#startList").addClass("disabled");
             $("#endList").removeClass("disabled");
         }
-        else if (pageIndex == $("#pageNumber").val() -1) {
+        else if (pageIndex == pageNumberCheck ) {
             $("#endList").addClass("disabled");
             $("#startList").removeClass("disabled");
         }
@@ -72,13 +78,11 @@
     });
 
     $("#startList a").click(function (event) {
-        var tmp = parseInt($("#pageNumber").val()) -1;
-        $("#" + currentPage + " button").removeClass("bg-primary text-white active");
-        currentPage = currentPage.substring(0, 2) + "1";
-        console.log(tmp);
-        console.log(currentPage);
-        $("#" + currentPage + " button").addClass("bg-primary text-white active");
-        var pageIndex = parseInt(currentPage.substring(2)) - 1;
+        
+        $(" button").removeClass("bg-primary text-white active");
+       
+        $("#" + 1 + " button").addClass("bg-primary text-white active");
+        var pageIndex = 1;
         
             $("#startList").addClass("disabled");
             $("#endList").removeClass("disabled");
@@ -100,19 +104,20 @@
 
     });
     $("#endList a").click(function (event) {
-        var tmp = parseInt($("#pageNumber").val()) ;
-        $("#" + currentPage + " button").removeClass("bg-primary text-white active");
-        currentPage = currentPage.substring(0, 2) + tmp.toString();
-        $("#" + currentPage + " button").addClass("bg-primary text-white active");
-        var pageIndex = parseInt(currentPage.substring(2)) - 1;
+        var pageIndex = parseInt(pageNumberCheck);
+        $(" button").removeClass("bg-primary text-white active");
+        console.log("pageNumber   " + pageIndex);
+        
        
-            $("#endList").addClass("disabled");
-            $("#startList").removeClass("disabled");
-      
+
+        $("#endList").addClass("disabled");
+        $("#startList").removeClass("disabled");
+
+
         $.ajax({
             type: "Post",
             url: "/staff/GetPage",
-            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox },
+            data: { pageIndex: pageIndex, keyPhongBan: keyPhongBan, keyBox: keyBox },
             dataType: "text",
             success: function (data) {
                 $("#StaffTable").html(data);
@@ -121,8 +126,9 @@
                 console.log(error);
 
             }
-        });
-
+        }); 
+        $("#" + pageIndex + " button").addClass("bg-primary text-white active");
+        
     });
 });
 

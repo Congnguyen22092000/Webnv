@@ -3,15 +3,15 @@ $(document).ready(function () {
     var searchBox = $("#SearchBox").val().toLowerCase();
     var searchPhongBan = $("#check").val();
     //Gọi trang đầu===========================================================
-    var value = "p-1";
+    var value = 1;
 
     $.ajax({
         type: "Post",
         url: "/staff/PageNav",
-        data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+        data: { pageNumber: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
         dataType: "text",
         success: function (data) {
-
+            console.log(value);
             $("#pagenav").html(data);
         },
         error: function (req, status, error) {
@@ -30,7 +30,7 @@ $(document).ready(function () {
         $.ajax({
             type: "Post",
             url: "/staff/PageNav",
-            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+            data: { pageNumber: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
             dataType: "text",
             success: function (data) {
                 /*$("#StaffTable").empty();*/
@@ -53,7 +53,7 @@ $(document).ready(function () {
         $.ajax({
             type: "Post",
             url: "/staff/PageNav",
-            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+            data: { pageNumber: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
             dataType: "text",
             success: function (data) {
                 /*$("#StaffTable").empty();*/
