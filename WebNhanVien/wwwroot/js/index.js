@@ -3,9 +3,8 @@ $(document).ready(function () {
     
     var searchBox = $("#SearchBox").val().toLowerCase();
     var searchPhongBan = $("#check").val();
-    //Gọi trang đầu===========================================================
     var value = "p-1";
-
+    //Gọi trang đầu===========================================================
     $.ajax({
         type: "Post",
         url: "/staff/PageNav",
@@ -21,7 +20,7 @@ $(document).ready(function () {
 
         }
     });
-    //===========================================================================
+    
     
     //check phòng ban==========================================================
     $("#check").change(function () {
@@ -44,6 +43,7 @@ $(document).ready(function () {
             }
         });
     });
+
 
     //Sự kiện tìm kiếm====================================================
     $("#SearchBox").on("keyup", function () {
@@ -92,13 +92,7 @@ $(document).ready(function () {
 
             }
         });
-        
-       
-        /*$("#" + temp).addClass("selected");*/
-
     });
-
-
 
     $("#hoTen").blur(function () {
 
@@ -249,35 +243,14 @@ $(document).ready(function () {
     });
 //Import Excel==================================================
     $("#ImportExcel").click(function () {
-        console.log("day la import");
-        $.ajax({
-            type: "post",
-            url: "/staff/Import",
+        console.log("bam vao inport");
+        $("#imPort").trigger("click");
 
-            success: function () {
-                $.ajax({
-                    type: "Post",
-                    url: "/staff/PageNav",
-                    data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
-                    dataType: "text",
-                    success: function (data) {
-
-                        $("#pagenav").html(data);
-
-                    },
-                    error: function (req, status, error) {
-                        console.log(error);
-
-                    }
-                });
-
-            },
-            error: function (req, status, error) {
-                console.log(error);
-
-
-            }
+        $("#imPort").change(function () {
+            $("#okImport").trigger("click");
         });
+        /*$("#okImport").trigger("click");*/
+        
     });
 //Export Excel==================================================
     $("#excelExport").click(function () {

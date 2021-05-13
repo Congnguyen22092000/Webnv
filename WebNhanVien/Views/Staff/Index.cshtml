@@ -3,6 +3,7 @@
 
 
 @{
+
     ViewData["Title"] = "Danh Sách Nhân Viên";
     var currentPage = (string)@ViewBag.currentPage;
     var pageNumber = (int)@ViewBag.pageNumber;
@@ -16,7 +17,7 @@
 
 
     <div style="display: -webkit-box;">
-        
+
 
 
 
@@ -68,9 +69,7 @@
                             <span id="ErrorMgsChucVu" class="text-danger"></span>
 
                             <label type="text" name="chucVu">Phòng ban</label>
-                            <select id="phongBan" name="ten_phong_ban" class="form-select " >
-                                
-                                
+                            <select id="phongBan" name="ten_phong_ban" class="form-select ">
                             </select>
                             <span id="ErrorMgsPhongBan" class="text-danger"></span>
 
@@ -88,18 +87,15 @@
         </div>
         @*Phần Tìm kiếm----------------------------------------------------------*@
         <form asp-action="index" method="post" asp-controller="Staff" class="input-group" style="margin-bottom: 20px;margin-left: 20px;max-width: 83%;">
-
-
-            <input id="SearchBox" style=" max-width: 86%;" name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search"
-                   aria-describedby="search-addon" />
+            <input id="SearchBox" style=" max-width: 86%;" name="key" type="search" class="form-control rounded" placeholder="Từ Khóa Cần Tìm" aria-label="Search" aria-describedby="search-addon" />
         </form>
         @*xuat file excel============================================================*@
         <button style="position: absolute;margin-left: 966px;" class="btn btn btn-outline-success float-right" id="excelExport"><i class="fas fa-file-excel"></i> Xuất File Excel</button>
-    
-    
+
+
     </div>
     @*Phòng ban============================================================*@
-<div style="display: flex;  ">
+    <div style="display: flex;  ">
 
     <div style="min-width: 110px;" class="btn btn-dark">Phòng ban:</div>
     <div style=" margin-left: 10px;">
@@ -112,16 +108,21 @@
         </select>
     </div>
 
-    <div style="padding: 0px;    padding-left: 439px;" class="container">
-        <form method="post" asp-controller="Staff" asp-action="Import" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <button class="btn btn-dark type="submit">Import Excel</button>
-        </form>
-    </div>
-</div>
+    @*Phần import excel====================================================*@
+    <button style="margin-left: 743px;" id="ImportExcel" class="btn btn-dark">Import Excel</button>
+    <div style="padding: 0px;    max-width: 1px;   " class="container">
 
+        <form enctype="multipart/form-data" method="post" asp-controller="Staff" asp-action="Import" hidden >
+            <input id="imPort" type="file" name="file"  />
+            <button id="okImport" class="btn btn-dark" type="submit">Import Excel</button>
+        </form>
+
+    </div>
+    </div>
 
     
+
+
 </div>
 
 

@@ -69,12 +69,7 @@ namespace WebNhanVien.Helpers
                     /*nhanvien = connection.Query<NhanVien>("SELECT * from \"Cong_Data\" order by \"maNhanVien\" ASC");*/
                 }
                 
-                    
-                    
-                    
-
-
-            }
+                 }
             //get ra tên phòng ban============================================================================================
             var tempList = nhanvien.ToList();
             using (var connection = new NpgsqlConnection(connectionString))
@@ -89,7 +84,7 @@ namespace WebNhanVien.Helpers
         }
 
 
-        //Get id phòng ban=====================================================================================================
+        //Get id từ tên phòng ban=====================================================================================================
         public static int searchPhongBan(string temp)
         {
 
@@ -110,6 +105,7 @@ namespace WebNhanVien.Helpers
 
             return x;
         }
+        //Kiêm tra tồn tại phòng ban=======================================================================
         public static bool checkPhongBan(string name)
         {
             IEnumerable<PhongBan> phongban = null;
@@ -128,6 +124,7 @@ namespace WebNhanVien.Helpers
             return false;
         }
 
+        //Get list phong ban===================================================================
         public static List<PhongBan> GetPhongBan(string key = null)
         {
             IEnumerable<PhongBan> phongban = null;
@@ -146,6 +143,8 @@ namespace WebNhanVien.Helpers
 
             return phongban.ToList();
         }
+
+        //Get tên phòng ban từ id=================================================================
         public static string ParsePhongBan(int id)
         {
             string getOut = "";
@@ -159,9 +158,25 @@ namespace WebNhanVien.Helpers
             return getOut;
 
         }
+
+        //Get id phòng ban lớn nhất
+        public static int GetCountPhongBan()
+        {
+            int idPhongBan;
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                connection.Open();
+                idPhongBan = connection.Query<int>("SELECT MAX(\"id\") FROM \"phong_ban\"").First();
+
+            }
+
+            return idPhongBan;
+        }
+
+
+        //Get mã nhân viên lớn nhất===============================================================
         public static int GetCount()
         {
-           
             int coutnTmp;
             using (var connection = new NpgsqlConnection(connectionString))
             {
@@ -171,14 +186,9 @@ namespace WebNhanVien.Helpers
                 string tmp = tmpMaNhanVien.Substring(5, 2);
                 
                 coutnTmp = int.Parse(tmp);
-
-
             }
 
             return coutnTmp;
-
-
-          
         }
 
 
@@ -207,6 +217,7 @@ namespace WebNhanVien.Helpers
             }
 
         }
+        //Tạo thêm nhân viên======================================================================
         public static void Create(NhanVien nv)
         {
             using (var connection = new NpgsqlConnection(connectionString))
@@ -217,8 +228,12 @@ namespace WebNhanVien.Helpers
             }
         }
 
+
+        //Update Nhân viên-----------------------------------------------------------------------
         public static void Update(NhanVien nv)
         {
+           
+           
             var tempList = Get("", "");
             var checkTonTai = false;
             foreach(NhanVien NV in tempList)
@@ -228,6 +243,7 @@ namespace WebNhanVien.Helpers
                     checkTonTai = true;
                 }
             }
+           
             if (checkTonTai == true)
             {
                 using (var connection = new NpgsqlConnection(connectionString))
@@ -247,6 +263,57 @@ namespace WebNhanVien.Helpers
                 }
             }
         }
+        //Import Nhân Viên=======================================================
+        public static void UpDateExcel(List<NhanVien> nv)
+        {
+            var listGoc = Get("", "");
+            var listMoi = nv;
+
+            foreach (NhanVien nhanvien in listMoi)
+            {
+                if (checkPhongBan(nhanvien.ten_phong_ban) == false)
+                {
+                    {
+                        using (var connection = new NpgsqlConnection(connectionString))
+                        {
+                            connection.Open();
+                            connection.Execute("insert into \"phong_ban\"(\"ten_phong_ban\") values(@tenPhongBan)", new { tenPhongBan = nhanvien.ten_phong_ban });
+
+                        }
+                    }
+                    nhanvien.phong_ban_id = DBHelper.GetCountPhongBan();
+                }
+                else
+                {
+                    nhanvien.phong_ban_id = searchPhongBan(nhanvien.ten_phong_ban);
+                }
+
+            }
+            for (int i = 0; i < listMoi.Count; i++)
+            {
+                bool checkTrung = true;
+                for (int j = 0; j < listGoc.Count; j++)
+                {
+                    if (listMoi[i].maNhanVien == listGoc[j].maNhanVien)
+                    {
+                        checkTrung = false;
+                        listGoc[j] = listMoi[i];
+                        break;
+                    }
+
+                }
+                if (checkTrung == true)
+                {
+                    listGoc.Add(listMoi[i]);
+                }
+            }
+
+            foreach (NhanVien nhanvien in listGoc)
+            {
+                Update(nhanvien);
+            }
+        }
+
         public static void Delete(string maNhanVien)
         {
             using (var connection = new NpgsqlConnection(connectionString))
@@ -334,33 +401,21 @@ namespace WebNhanVien.Helpers
 
         }
 
-        public static void UpDateExcel(List<NhanVien> nv)
+        
+
+        public static bool checkTrungMaNhanVien(List<NhanVien> nv, string maNhanVien)
         {
-            var listGoc = Get("","");
-            var listMoi = nv;
-            for(int i = 0; i< listMoi.Count; i++)
+            bool checkTrung = false;
+            for (int j = 0; j < nv.Count; j++)
             {
-                bool checkTrung = true;
-                for(int j= 0;j < listGoc.Count; j++)
+                if (maNhanVien == nv[j].maNhanVien)
                 {
-                    if (listMoi[i].maNhanVien == listGoc[j].maNhanVien)
-                    {
-                        checkTrung= false;
-                        listGoc[j] = listMoi[i];
-                        break;
-                    }
-                    
+                    checkTrung = true;
+                    break;
                 }
-                if (checkTrung == true)
-                {
-                    listGoc.Add(listMoi[i]);
-                }
+
             }
-            var temp = listGoc;
-            foreach(NhanVien nhanvien in listGoc)
-            {
-                Update(nhanvien);
-            }
+            return checkTrung;
         }
     }
 }

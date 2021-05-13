@@ -236,40 +236,176 @@ namespace WebNhanVien.Controllers
         [HttpPost]
         public async Task<IActionResult> Import(IFormFile file)
         {
-                    var list = new List<NhanVien>();
-                    using (var stream = new MemoryStream())
+            List<string> BaoLoi = new List<string>();
+            
+            int coutOld = 0;
+            int coutNew = 0;
+            var list = new List<NhanVien>();
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using(var package = new ExcelPackage(stream))
+                {
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    var rowcount = worksheet.Dimension.Rows;
+                    var dem = 0;
+                    for(int row = 2 ; row<rowcount+1 ; row++)
                     {
-                        await file.CopyToAsync(stream);
-                        using(var package = new ExcelPackage(stream))
+                        string tempMaNull = "";
+                        bool checkOut = false;
+                        //Bắt ngoại lệ định dạng ngày tháng
+                        try
                         {
-                            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                            var rowcount = worksheet.Dimension.Rows;
-                            for(int row = 2 ; row<rowcount+1 ; row++)
+                            if(worksheet.Cells[row, 3].Value == null)
                             {
-                                var dateString = worksheet.Cells[row, 3].Value;
-                                /*var check = typeof(dateString);*/
-                               
-                                var tempDate = worksheet.Cells[row, 3].Value.ToString().Trim();
-                                var tempID = (double)worksheet.Cells[row, 7].Value;
-                                list.Add(new NhanVien
+                                checkOut = true;
+                            }
+                            else
+                            {
+                                var ad = (DateTime)worksheet.Cells[row, 3].Value;
+                            }
+                            // khối này được giám sát để bắt lỗi - khi nó phát sinh
+                           
+
+                        }
+                        catch (Exception)
+                        {
+                            tempMaNull = worksheet.Cells[row, 1].Value.ToString().Trim();
+                            BaoLoi.Add(tempMaNull);
+                            checkOut = true;
+
+                        }
+                        //bắt lỗi trống dữ liệu===============
+                        if (checkOut == false)
+                        {
+                            for (int colum = 2; colum < 9; colum++)
+                            {
+                                var checkNull = worksheet.Cells[row, colum].Value;
+                                if (checkNull == null)
                                 {
+                                    tempMaNull = worksheet.Cells[row, 1].Value.ToString().Trim();
+                                    BaoLoi.Add(tempMaNull);
+                                    checkOut = true;
+                                }
+                            }
+                        }
+                        
+                         
+                        if(checkOut == true)
+                        {
+                            continue;
+                        }
+                        
+                        var check = worksheet.Cells[row, 1].Value;
+
+                        //mã nhân viên trống=================
+                        if (check == null)
+                        {
+                            coutNew++;
+                            float temp = DBHelper.GetCount() + dem +1 ;
+                            String tempMaNhanVien;
+                            if (temp >= 10)
+                            {
+                                    tempMaNhanVien = "NV-00" + temp.ToString();
+                            }
+                                     
+                            else
+                            {
+                                    tempMaNhanVien = "NV-000" + temp.ToString();
+                            }
+                            list.Add(new NhanVien
+                            {
+                                maNhanVien = tempMaNhanVien,
+                                hoTen = worksheet.Cells[row, 2].Value.ToString().Trim(),
+                                ngaySinh = (DateTime)worksheet.Cells[row, 3].Value,
+                                soDT = worksheet.Cells[row, 4].Value.ToString().Trim(),
+                                diaChi = worksheet.Cells[row, 5].Value.ToString().Trim(),
+                                chucVu = worksheet.Cells[row, 6].Value.ToString().Trim(),
+                                phong_ban_id = 0,
+                                ten_phong_ban = worksheet.Cells[row, 8].Value.ToString().Trim()
+                            });
+                        }
+                        //mã nhân viên không trống
+                        else
+                        {
+
+                            if(checkOutImport(check.ToString().Trim()) == true)
+                            {
+                                        continue;
+                            }
+                            else
+                            {
+                                if(DBHelper.checkTrungMaNhanVien(DBHelper.Get("",""), check.ToString().Trim()) == true)
+                                {
+                                    coutOld++;
+                                }
+                                else
+                                {
+                                    coutNew++;
+                                }
+                                var listGoc = DBHelper.Get("", "");
+                                if(DBHelper.checkTrungMaNhanVien(listGoc, check.ToString().Trim())==false)
+                                    {
+                                            dem++;
+                                    }
+                                list.Add(new NhanVien
+                                {   
                                     maNhanVien = worksheet.Cells[row, 1].Value.ToString().Trim(),
                                     hoTen = worksheet.Cells[row, 2].Value.ToString().Trim(),
                                     ngaySinh = (DateTime)worksheet.Cells[row, 3].Value,
                                     soDT = worksheet.Cells[row, 4].Value.ToString().Trim(),
                                     diaChi = worksheet.Cells[row, 5].Value.ToString().Trim(),
                                     chucVu = worksheet.Cells[row, 6].Value.ToString().Trim(),
-                                    phong_ban_id = (int)tempID,
+                                    phong_ban_id = 0,
                                     ten_phong_ban = worksheet.Cells[row, 8].Value.ToString().Trim()
                                 });
                             }
                         }
                     }
-                    DBHelper.UpDateExcel(list);
-                    return Redirect("/staff/index"); 
+                }
+            }
+            ViewBag.coutLoi = BaoLoi.Count();
+            ViewBag.BaoLoi = BaoLoi;
+            ViewBag.coutOld = coutOld.ToString();
+            ViewBag.coutNew = coutNew.ToString();
+            DBHelper.UpDateExcel(list);
+            return View();
         }
         
+        public bool checkOutImport(string maNV)
+        {
+            bool check = false;
+            if (maNV.Length != 7)
+            {
+                check = true;
+            }
+            else
+            {
+                string temp = maNV.Substring(3, 4);
+                int checkInt = 0;
+                for(int i =0; i <temp.Length; i++)
+                {
+                    string tempIn = temp.Substring(i, 1);
+                    for (int j = 0;j < 10; j++)
+                    {
+                        
+                        if(tempIn == j.ToString())
+                        {
+                            checkInt++;
+                            break;
+                        }
+                    }
+                }
+                check = checkInt == 4 ? false : true;
+            }
+            if (maNV.IndexOf("NV-") == -1)
+            {
+                check = true;
+            }
+            
+            return check;
+        }
         public IActionResult Export()
         {
             var tempPhongBan = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("keyPhongBanSS"));
