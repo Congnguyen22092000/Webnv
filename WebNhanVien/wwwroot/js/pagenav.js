@@ -27,7 +27,7 @@
     $.ajax({
         type: "Post",
         url: "/staff/GetPage",
-        data: { pageIndex: parseInt(value), keyPhongBan: keyPhongBan, keyBox: keyBox , ageMin:ageMin, ageMax:ageMax },
+        data: { pageIndex: value, keyPhongBan: keyPhongBan, keyBox: keyBox , ageMin:ageMin, ageMax:ageMax },
         dataType: "text",
         success: function (data) {
             $("#StaffTable").html(data);

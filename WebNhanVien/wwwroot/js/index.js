@@ -8,7 +8,7 @@ $(document).ready(function () {
     var searchBox = $("#SearchBox").val().toLowerCase();
     var searchPhongBan = $("#check").val();
     var value = "p-1";
-
+   
     //Gọi trang đầu===========================================================
     if ($("#pagenav").val() == "") {
         $.ajax({
@@ -32,6 +32,8 @@ $(document).ready(function () {
     
     //check phòng ban==========================================================
     $("#check").change(function () {
+        
+        console.log("value la" + value);
          ageMin = $("#minAge").val();
         ageMax = $("#maxAge").val();
         searchBox = $("#SearchBox").val().toLowerCase();
@@ -56,6 +58,7 @@ $(document).ready(function () {
 
     //Sự kiện tìm kiếm====================================================
     $("#SearchBox").on("keyup", function () {
+        
         ageMin = $("#minAge").val();
         ageMax = $("#maxAge").val();
         searchBox = $("#SearchBox").val().toLowerCase();

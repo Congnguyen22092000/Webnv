@@ -49,12 +49,13 @@ namespace WebNhanVien.Controllers
 
             if ((int)DBHelper.Get().Count % itemPerPage == 0)
             {
-                ViewBag.currentPage = "p-" + (int)DBHelper.Get().Count / itemPerPage;
+                ViewBag.currentPage = "p-" + ((int)DBHelper.Get().Count / itemPerPage - 1) ;
             }
             else
             {
                 ViewBag.currentPage = currentPage;
             }
+
             ViewBag.pageNumber = (int)DBHelper.Get().Count / itemPerPage;
 
            
@@ -176,7 +177,7 @@ namespace WebNhanVien.Controllers
             ViewBag.keyPhongBan = keyPhongBan;
             if ((int)DBHelper.Get().Count % itemPerPage == 0)
             {
-                ViewBag.currentPage = "p-" + (int)DBHelper.Get().Count / itemPerPage;
+                ViewBag.currentPage = "p-" + ((int)DBHelper.Get().Count / itemPerPage -1);
             }
             else
             {
