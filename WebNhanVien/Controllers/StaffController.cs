@@ -168,8 +168,10 @@ namespace WebNhanVien.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult PageNav(string currentPage = "p-1",string keyPhongBan="",string keyBox="")
+        public IActionResult PageNav(string currentPage = "p-1",string keyPhongBan="",string keyBox="", int ageMin = 0, int ageMax = 100)
         {
+            ViewBag.ageMin = ageMin;
+            ViewBag.ageMax = ageMax;
             ViewBag.keyBox = keyBox;
             ViewBag.keyPhongBan = keyPhongBan;
             if ((int)DBHelper.Get().Count % itemPerPage == 0)
@@ -180,21 +182,23 @@ namespace WebNhanVien.Controllers
             {
                 ViewBag.currentPage = currentPage;
             }
-            if ((int)DBHelper.Get(keyPhongBan, keyBox).Count % itemPerPage == 0)
+            if ((int)DBHelper.Get(keyPhongBan, keyBox, ageMin, ageMax).Count % itemPerPage == 0)
             {
-                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage;
+                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox, ageMin,ageMax).Count / itemPerPage;
             }
             else
             {
-                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox).Count / itemPerPage + 1;
+                ViewBag.pageNumber = (int)DBHelper.Get(keyPhongBan, keyBox, ageMin, ageMax).Count / itemPerPage + 1;
             }
             
 
             return View();
         }
         [HttpPost]
-        public IActionResult GetPage(int pageIndex, string keyPhongBan = "", string keyBox = "")
+        public IActionResult GetPage(int pageIndex, string keyPhongBan = "", string keyBox = "", int ageMin = 0, int ageMax = 100)
         {
+            HttpContext.Session.SetString("ageMin", JsonConvert.SerializeObject(ageMin));
+            HttpContext.Session.SetString("ageMax", JsonConvert.SerializeObject(ageMax));
             HttpContext.Session.SetString("keyPhongBanSS", JsonConvert.SerializeObject(keyPhongBan));
             HttpContext.Session.SetString("keyBoxSS", JsonConvert.SerializeObject(keyBox));
             ViewBag.dsPhongban = DBHelper.GetPhongBan();
@@ -202,7 +206,7 @@ namespace WebNhanVien.Controllers
             ViewBag.itemPerPage = itemPerPage;
             ViewBag.phongBan = keyPhongBan;
             ViewBag.box = keyBox;
-            return View(DBHelper.Get(keyPhongBan, keyBox));
+            return View(DBHelper.Get(keyPhongBan, keyBox, ageMin, ageMax));
         }
 
         public bool IsDuplicatedStaff(NhanVien pnv)
@@ -259,7 +263,17 @@ namespace WebNhanVien.Controllers
                         {
                             if(worksheet.Cells[row, 3].Value == null)
                             {
-                                checkOut = true;
+                                if(worksheet.Cells[row, 1].Value == null)
+                                {
+                                    checkOut = true;
+                                }
+                                else
+                                {
+                                    tempMaNull = worksheet.Cells[row, 1].Value.ToString().Trim();
+                                    BaoLoi.Add(tempMaNull);
+                                    checkOut = true;
+                                }
+                                
                             }
                             else
                             {
@@ -276,6 +290,7 @@ namespace WebNhanVien.Controllers
                             checkOut = true;
 
                         }
+
                         //bắt lỗi trống dữ liệu===============
                         if (checkOut == false)
                         {
@@ -410,11 +425,25 @@ namespace WebNhanVien.Controllers
         {
             var tempPhongBan = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("keyPhongBanSS"));
             var tempBox = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("keyBoxSS"));
-            var data = DBHelper.Get(tempPhongBan, tempBox).ToList();
+            var ageMin = JsonConvert.DeserializeObject<int>(HttpContext.Session.GetString("ageMin"));
+            var ageMax = JsonConvert.DeserializeObject<int>(HttpContext.Session.GetString("ageMax"));
+            var data = DBHelper.Get(tempPhongBan, tempBox ,ageMin ,ageMax);
             /*var stream = new MemoryStream();*/
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var stream = DBHelper.Export(data);
             var nameFile = "PB-" + tempPhongBan + ".xlsx";
+            stream.Position = 0;
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nameFile);
+        }
+
+        public IActionResult ExportBieuMau()
+        {
+            
+            var data = DBHelper.getNull();
+            /*var stream = new MemoryStream();*/
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var stream = DBHelper.ExportBieuMau(data);
+            var nameFile =  "Biểu Mẫu.xlsx";
             stream.Position = 0;
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nameFile);
         }

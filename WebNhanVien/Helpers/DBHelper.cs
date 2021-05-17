@@ -18,7 +18,7 @@ namespace WebNhanVien.Helpers
     {
         private static readonly string connectionString = "HOST=127.0.0.1;Username=postgres;Password=cong2209;Database=CongData";
         
-        public static List<NhanVien> Get(string keyPhongBan =  "",string keyBox = "")
+        public static List<NhanVien> Get(string keyPhongBan =  "",string keyBox = "",int ageMin = 0, int ageMax =100)
         {
             if (keyPhongBan == "")
             {
@@ -79,35 +79,64 @@ namespace WebNhanVien.Helpers
                     nv.ten_phong_ban = connection.Query<string>("select ten_phong_ban from phong_ban where id = @id", new { id = nv.phong_ban_id }).First();
                 }
             }
-                
-            return tempList;
+            //Check độ tuổi
+            List<NhanVien> outList = new List<NhanVien>();
+            if(ageMin >= 0 || ageMax <= 100)
+            {
+                int nowYear = DateTime.Now.Year;
+                foreach(NhanVien nhanVien in tempList)
+                {
+                    if(nowYear - nhanVien.ngaySinh.Year >= ageMin && nowYear - nhanVien.ngaySinh.Year <= ageMax)
+                    {
+                        outList.Add(nhanVien);
+                    }
+                }
+            }
+               
+            return outList;
+        }
+
+        //Lấy ra list rỗng
+        public static List<NhanVien> getNull()
+        {
+            List<NhanVien> nv = new List<NhanVien>();
+            return nv;
         }
 
 
         //Get id từ tên phòng ban=====================================================================================================
         public static int searchPhongBan(string temp)
         {
-
             int x = 0;
-            using (var connection = new NpgsqlConnection(connectionString))
+           
+            if (checkPhongBan(temp) != "False")
             {
-                if (connection.Query<int>("select id from phong_ban where ten_phong_ban = @ten", new { ten = temp }).First() == 0)
+                using (var connection = new NpgsqlConnection(connectionString))
                 {
-                    x = 0;
-                }
-                else
-                {
-                    x = connection.Query<int>("select id from phong_ban where ten_phong_ban = @ten", new { ten = temp }).First();
-                }
+                    if (connection.Query<int>("select id from phong_ban where ten_phong_ban = @ten", new { ten = temp }).First() == 0)
+                    {
+                        x = 0;
+                    }
+                    else
+                    {
+                        x = connection.Query<int>("select id from phong_ban where ten_phong_ban = @ten", new { ten = temp }).First();
+                    }
 
 
+                }
             }
+            else
+            {
+                x = 0;
+            }
+            
 
             return x;
         }
         //Kiêm tra tồn tại phòng ban=======================================================================
-        public static bool checkPhongBan(string name)
+        public static string checkPhongBan(string name)
         {
+            var outString = "";
             IEnumerable<PhongBan> phongban = null;
             using (var connection = new NpgsqlConnection(connectionString))
             {
@@ -116,12 +145,12 @@ namespace WebNhanVien.Helpers
             var tempList = phongban.ToList();   
             foreach(PhongBan pb in tempList)
             {
-                if(pb.ten_phong_ban == name)
+                if(ReplaceUnicode(pb.ten_phong_ban).ToLower() == ReplaceUnicode(name).ToLower())
                 {
-                    return true;
+                    return outString = pb.ten_phong_ban;
                 }
             }
-            return false;
+            return "False";
         }
 
         //Get list phong ban===================================================================
@@ -271,7 +300,7 @@ namespace WebNhanVien.Helpers
 
             foreach (NhanVien nhanvien in listMoi)
             {
-                if (checkPhongBan(nhanvien.ten_phong_ban) == false)
+                if (checkPhongBan(nhanvien.ten_phong_ban) == "False")
                 {
                     {
                         using (var connection = new NpgsqlConnection(connectionString))
@@ -285,7 +314,7 @@ namespace WebNhanVien.Helpers
                 }
                 else
                 {
-                    nhanvien.phong_ban_id = searchPhongBan(nhanvien.ten_phong_ban);
+                    nhanvien.phong_ban_id = searchPhongBan(checkPhongBan(nhanvien.ten_phong_ban));
                 }
 
             }
@@ -401,7 +430,75 @@ namespace WebNhanVien.Helpers
 
         }
 
-        
+        public static Stream ExportBieuMau(List<NhanVien> data = null)
+        {
+
+            var stream = new MemoryStream();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage(stream))
+            {
+
+
+                var excelWorkSheet = package.Workbook.Worksheets.Add("Sheet1");
+                //Do du lieu
+                /*sheet.Cells.LoadFromCollection(data, true);
+                package.Save();*/
+
+                excelWorkSheet.Cells["A1"].Value = "Mã Nhân Viên";
+
+                excelWorkSheet.Cells["B1"].Value = "Họ Tên";
+                excelWorkSheet.Cells["C1"].Value = "Ngày Sinh";
+                excelWorkSheet.Cells["D1"].Value = "Số Điện Thoại";
+                excelWorkSheet.Cells["E1"].Value = "Địa Chỉ";
+                excelWorkSheet.Cells["F1"].Value = "Chức Vụ";
+                excelWorkSheet.Cells["G1"].Value = "Phong Ban ID";
+                excelWorkSheet.Cells["H1"].Value = "Tên Phòng Ban";
+                excelWorkSheet.Cells["A2"].LoadFromCollection(data);
+                /*excelWorkSheet.Cells["C2:C" + (data.Count + 1).ToString()].Style.Numberformat.Format = "dd/MM/yyyy";*/
+
+                //set boder----------------------------------------------------------------
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.Font.Size = 12;
+                excelWorkSheet.Cells["A1:H1"].Style.Font.Color.SetColor(Color.White);
+                excelWorkSheet.Cells["A1:H1"].Style.Font.Bold = true;
+                excelWorkSheet.Cells["A1:H1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                excelWorkSheet.Cells["A1:H1"].Style.Fill.BackgroundColor.SetColor(Color.Green);
+
+                // excelWorkSheet.Cells["A1:H1"].Style.GetT.SetColor(Color.Green);
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Top.Style = ExcelBorderStyle.Thick;
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+                excelWorkSheet.Cells["A1:H1"].Style.Border.Left.Style = ExcelBorderStyle.Thick;
+                //Set style and color------------------------------------------------------
+
+                double minimumSize = 15;
+                excelWorkSheet.Cells[excelWorkSheet.Dimension.Address].AutoFitColumns(minimumSize);
+
+                double maximumSize = 100;
+                excelWorkSheet.Cells[excelWorkSheet.Dimension.Address].AutoFitColumns(minimumSize, maximumSize);
+                double rowHeight = 15;
+                for (int row = 1; row <= data.Count + 1; row++)
+                {
+                    excelWorkSheet.Row(row).Height = rowHeight;
+                }
+
+                for (int col = 1; col <= excelWorkSheet.Dimension.End.Column; col++)
+                {
+                    excelWorkSheet.Column(col).Width = excelWorkSheet.Column(col).Width + 1;
+                }
+
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+               
+                excelWorkSheet.Cells["A1:H" + (data.Count + 1).ToString()].Style.WrapText = true;
+                excelWorkSheet.Column(7).Hidden = true;
+                package.Save();
+            }
+            return stream;
+
+
+
+
+        }
 
         public static bool checkTrungMaNhanVien(List<NhanVien> nv, string maNhanVien)
         {
@@ -416,6 +513,37 @@ namespace WebNhanVien.Helpers
 
             }
             return checkTrung;
+        }
+
+        //Hàm chuyển dấu tiếng việt=======================================
+        private static string[] VietNamChar = new string[]
+       {
+           "aAeEoOuUiIdDyY",
+           "áàạảãâấầậẩẫăắằặẳẵ",
+           "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ",
+           "éèẹẻẽêếềệểễ",
+           "ÉÈẸẺẼÊẾỀỆỂỄ",
+           "óòọỏõôốồộổỗơớờợởỡ",
+           "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ",
+           "úùụủũưứừựửữ",
+           "ÚÙỤỦŨƯỨỪỰỬỮ",
+           "íìịỉĩ",
+           "ÍÌỊỈĨ",
+           "đ",
+           "Đ",
+           "ýỳỵỷỹ",
+           "ÝỲỴỶỸ"
+       };
+        public static string ReplaceUnicode(string strInput)
+        {
+            for (int i = 1; i < VietNamChar.Length; i++)
+            {
+                for (int j = 0; j < VietNamChar[i].Length; j++)
+                {
+                    strInput = strInput.Replace(VietNamChar[i][j], VietNamChar[0][i - 1]);
+                }
+            }
+            return strInput;
         }
     }
 }

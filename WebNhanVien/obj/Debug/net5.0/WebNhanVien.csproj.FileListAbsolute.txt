@@ -6460,3 +6460,4 @@ C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\ref
 C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\WebNhanVien.pdb
 C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\WebNhanVien.genruntimeconfig.cache
 D:\tempGit\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\Import.cshtml.g.cs
+C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\Import.cshtml.g.cs

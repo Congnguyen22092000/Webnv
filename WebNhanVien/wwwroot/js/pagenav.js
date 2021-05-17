@@ -1,9 +1,12 @@
 ﻿$(document).ready(function () {
+    var ageMin = $("#ageMin").val();
+    var ageMax = $("#ageMax").val();
+   
     var keyBox = $("#keyBox").val();
     var keyPhongBan = $("#keyPhongBan").val();
-    console.log("keyPhongBan o pagenav= " + keyPhongBan);
+   /* console.log("keyPhongBan o pagenav= " + keyPhongBan);
     console.log("so trang= " + parseInt($("#TemppageNumber").val()));
-    console.log("so trang theo curent= " + parseInt($("#currentPage").val().substring(2)));
+    console.log("so trang theo curent= " + parseInt($("#currentPage").val().substring(2)));*/
     
     for (var i = parseInt($("#TemppageNumber").val()); i > 0; i--) {
         var li = "<li class='page-item' id='p-" + (i ).toString() + "'><button class='page-link'>" + (i ).toString() + "</button></li>";
@@ -24,7 +27,7 @@
     $.ajax({
         type: "Post",
         url: "/staff/GetPage",
-        data: { pageIndex: parseInt(value), keyPhongBan: keyPhongBan, keyBox: keyBox  },
+        data: { pageIndex: parseInt(value), keyPhongBan: keyPhongBan, keyBox: keyBox , ageMin:ageMin, ageMax:ageMax },
         dataType: "text",
         success: function (data) {
             $("#StaffTable").html(data);
@@ -59,7 +62,7 @@
         $.ajax({
             type: "Post",
             url: "/staff/GetPage",
-            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox },
+            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox, ageMin: ageMin, ageMax: ageMax},
             dataType: "text",
             success: function (data) {
                 $("#StaffTable").html(data);
@@ -89,7 +92,7 @@
         $.ajax({
             type: "Post",
             url: "/staff/GetPage",
-            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox },
+            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox, ageMin: ageMin, ageMax: ageMax },
             dataType: "text",
             success: function (data) {
                 $("#StaffTable").html(data);
@@ -114,7 +117,7 @@
         $.ajax({
             type: "Post",
             url: "/staff/GetPage",
-            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox },
+            data: { pageIndex: parseInt(pageIndex), keyPhongBan: keyPhongBan, keyBox: keyBox, ageMin: ageMin, ageMax: ageMax },
             dataType: "text",
             success: function (data) {
                 $("#StaffTable").html(data);

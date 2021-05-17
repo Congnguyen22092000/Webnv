@@ -1,6 +1,8 @@
 ﻿@using WebNhanVien.Controllers
 @{
     Layout = "StaffLayout";
+    var ageMin = (int)ViewBag.ageMin;
+    var ageMax = (int)ViewBag.ageMax;
     var currentPage = (string)@ViewBag.currentPage;
     var pageNunber = (int)ViewBag.pageNumber;
     var keyBox = (string)@ViewBag.keyBox;
@@ -9,6 +11,8 @@
 <input type="text" id="keyBox" value="@keyBox" hidden />
 <input type="text" id="keyPhongBan" value="@keyPhongBan" hidden  />
 <input type="number" id="pageNumber" value="@pageNunber" hidden />
+<input type="number" id="ageMin" value="@ageMin" hidden />
+<input type="number" id="ageMax" value="@ageMax" hidden />
 <input type="number" id="TemppageNumber" value="@pageNunber" hidden />
 <input type="text" id="currentPage" value="@currentPage" hidden />
 <nav aria-label="Page navigation">

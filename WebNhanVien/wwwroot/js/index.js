@@ -1,37 +1,46 @@
 ﻿
+
 $(document).ready(function () {
-    
+    var changeMin = false;
+    var changeMax = false;
+    var ageMin = $("#minAge").val();
+    var ageMax = $("#maxAge").val();
     var searchBox = $("#SearchBox").val().toLowerCase();
     var searchPhongBan = $("#check").val();
     var value = "p-1";
+
     //Gọi trang đầu===========================================================
-    $.ajax({
-        type: "Post",
-        url: "/staff/PageNav",
-        data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
-        dataType: "text",
-        success: function (data) {
+    if ($("#pagenav").val() == "") {
+        $.ajax({
+            type: "Post",
+            url: "/staff/PageNav",
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox, ageMin: ageMin, ageMax: ageMax },
+            dataType: "text",
+            success: function (data) {
 
-            $("#pagenav").html(data);
-            
-        },
-        error: function (req, status, error) {
-            console.log(error);
+                $("#pagenav").html(data);
 
-        }
-    });
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+    }
+    
     
     
     //check phòng ban==========================================================
     $("#check").change(function () {
-        
+         ageMin = $("#minAge").val();
+        ageMax = $("#maxAge").val();
         searchBox = $("#SearchBox").val().toLowerCase();
         searchPhongBan = $("#check").val();
         console.log(searchPhongBan);
         $.ajax({
             type: "Post",
             url: "/staff/PageNav",
-            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox, ageMin: ageMin, ageMax: ageMax },
             dataType: "text",
             success: function (data) {
                 /*$("#StaffTable").empty();*/
@@ -47,14 +56,16 @@ $(document).ready(function () {
 
     //Sự kiện tìm kiếm====================================================
     $("#SearchBox").on("keyup", function () {
+        ageMin = $("#minAge").val();
+        ageMax = $("#maxAge").val();
         searchBox = $("#SearchBox").val().toLowerCase();
         searchPhongBan = $("#check").val();
-        
+        console.log(searchBox);
         
         $.ajax({
             type: "Post",
             url: "/staff/PageNav",
-            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox },
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox, ageMin: ageMin, ageMax: ageMax },
             dataType: "text",
             success: function (data) {
                
@@ -68,6 +79,85 @@ $(document).ready(function () {
 
     });
 
+    //TÌm kiếm theo tuổi===================================================
+    $("#searchHight").click(function () {
+        console.log("da vao tim kiem theo tuoi");
+        $("#searchTuoi").prop("hidden", false);
+        
+        //out click====================
+        
+        
+    });
+    $("#minAge").change(function () {
+        changeMin = true;
+        ageMin = $("#minAge").val();
+        console.log("check change min");
+        if (ageMin < 0) {
+            alert("Số tuổi không thể là âm, vui lòng nhập lại!");
+        }
+        
+    });
+    $("#maxAge").change(function () {
+        changeMax = true;
+        ageMax = $("#maxAge").val();
+        console.log("check change max");
+        if (ageMax < 0) {
+            alert("Số tuổi không thể là âm, vui lòng nhập lại!");
+        }
+    });
+    //out tim kiem Age===============
+    $("#outSearchAge").click(function () {
+        $("#minAge").val(0)  ;
+        $("#maxAge").val(100) ;
+        console.log("da vao out tuoi");
+        $("#searchTuoi").prop("hidden", true);
+        $.ajax({
+            type: "Post",
+            url: "/staff/PageNav",
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox, ageMin: 0, ageMax: 100 },
+            dataType: "text",
+            success: function (data) {
+
+                $("#pagenav").html(data);
+                console.log(ageMin + "  " + ageMax);
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+    });
+    //Submt click=====================
+    $("#getAge").click(function () {
+        if (changeMin == false & changeMax == true) {
+            
+            $("#minAge").val(0);
+        }
+        if (changeMax == false & changeMin == true) {
+            $("#maxAge").val(100);
+        }
+        var ageMin = $("#minAge").val();
+        var ageMax = $("#maxAge").val();
+        $.ajax({
+            type: "Post",
+            url: "/staff/PageNav",
+            data: { currentPage: value, keyPhongBan: searchPhongBan, keyBox: searchBox, ageMin: ageMin, ageMax: ageMax },
+            dataType: "text",
+            success: function (data) {
+
+                $("#pagenav").html(data);
+                console.log(ageMin + "  " + ageMax);
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+            }
+        });
+        console.log(ageMin + "  " + ageMax);
+        changeMin = false;
+        changeMax = false;
+    });
+    
     //sự kiện thêm nhân viên===============================================
     var checkHoTen = false;
     var checkDate = false;
@@ -252,7 +342,7 @@ $(document).ready(function () {
         /*$("#okImport").trigger("click");*/
         
     });
-//Export Excel==================================================
+    //Export Excel==================================================
     $("#excelExport").click(function () {
         console.log(searchPhongBan);
         $.ajax({
@@ -272,6 +362,25 @@ $(document).ready(function () {
         });
     });
 
+    //Lấy biểu mẫu ==================================================
+    $("#getBieumau").click(function () {
+        console.log(searchPhongBan);
+        $.ajax({
+            type: "post",
+            url: "/staff/ExportBieuMau",
+
+            success: function () {
+
+                window.location = "/staff/ExportBieuMau";
+
+            },
+            error: function (req, status, error) {
+                console.log(error);
+
+
+            }
+        });
+    });
 });
 
 

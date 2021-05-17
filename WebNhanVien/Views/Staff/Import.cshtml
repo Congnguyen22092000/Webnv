@@ -1,0 +1,53 @@
+﻿
+@{
+    var BaoLoi = ViewBag.BaoLoi;
+    var coutLoi = ViewBag.coutLoi;
+    Layout = "StaffLayout";
+    var coutNew = ViewBag.coutNew;
+    var coutOld = ViewBag.coutOld;
+
+}
+<input type="text" id="coutNew" value="@coutNew" hidden />
+<input type="text" id="coutOld" value="@coutOld" hidden />
+<input type="text" id="BaoLoi" value="@BaoLoi" hidden />
+
+<button type="button" id="imPort" class="btn btn-warning btnDelete" style="background-color:#900c0c; border-color:#900c0c;color:#ffffff;" data-toggle="modal" data-target="#thu" hidden>Xóa</button>
+<div class="modal" id="thu" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                
+                <h5 style="color:#000000;" class="modal-title">Thông Báo</h5>
+                
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <h6>Thêm mới: @coutNew </h6>
+                -----------------------------
+                <h6>Cập nhật: @coutOld </h6>
+                -----------------------------
+                @if (coutLoi > 0)
+                {
+                    <h6>
+                        Có lỗi dữ liệu! Vui lòng kiểm tra lại:
+
+                    </h6>
+                    @for (int i = 0; i < coutLoi; i++)
+                    {
+                        <h6>@BaoLoi[i]</h6>
+                    }
+                }
+
+            </div>
+            <div class="modal-footer">
+               
+                <button id="nextImport" class="btn btn-success"  >Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/Import.js"></script>
+}
