@@ -88,7 +88,7 @@ $(document).ready(function () {
         
         
     });
-    $("#minAge").change(function () {
+    $("#minAge").blur(function () {
         changeMin = true;
         ageMin = $("#minAge").val();
         console.log("check change min");
@@ -97,7 +97,7 @@ $(document).ready(function () {
         }
         
     });
-    $("#maxAge").change(function () {
+    $("#maxAge").blur(function () {
         changeMax = true;
         ageMax = $("#maxAge").val();
         console.log("check change max");
