@@ -6461,3 +6461,7 @@ C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\Web
 C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\WebNhanVien.genruntimeconfig.cache
 D:\tempGit\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\Import.cshtml.g.cs
 C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\Import.cshtml.g.cs
+D:\tempGit\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\ViewMap.cshtml.g.cs
+D:\tempGit\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\GetSearchMap.cshtml.g.cs
+C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\GetSearchMap.cshtml.g.cs
+C:\Users\congn\OneDrive\Tài liệu\web\Webnv\WebNhanVien\obj\Debug\net5.0\Razor\Views\Staff\ViewMap.cshtml.g.cs

@@ -1,0 +1,29 @@
+﻿#searchMap {
+    z-index: 1000;
+    position: fixed;
+    right: 130px;
+    top: 20px;
+}
+
+#searchBox {
+    z-index: 1000;
+    position: fixed;
+    right: 283px;
+    top: 21px;
+    min-height: 37px;
+    border: 1px solid;
+    border-radius: 3px;
+    border-color:#fff;
+}
+
+#tableView {
+    position: fixed;
+    z-index: 1000;
+    border: 1px solid;
+    right: 130px;
+    top: 69px;
+    width: 333px;
+    border-radius: 3px;
+    background-color: #fff;
+    border-color: #fff;
+}

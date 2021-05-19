@@ -1,0 +1,30 @@
+﻿@model List<WebNhanVien.Models.NhanVien>
+@using WebNhanVien.Controllers
+
+@{
+
+    Layout = "StaffLayout";
+
+}
+<table id="tableSearch" class="table   table-striped">
+    <tr>
+        <td>Mã Nhân Viên</td>
+        <td>Họ Tên</td>
+    </tr>
+    @for (var i = 0; i < Model.Count; i++)
+    {
+
+        <tr style="cursor:pointer;">
+            <td><a id="@Model[i].maNhanVien">@Model[i].maNhanVien</a></td>
+            <td>@Model[i].hoTen</td>
+        </tr>
+
+    }
+
+
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/viewMap.js"></script>
+}

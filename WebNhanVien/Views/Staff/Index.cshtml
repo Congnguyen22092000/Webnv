@@ -13,17 +13,8 @@
 
 <h1 style="text-align: center;">@ViewData["Title"]</h1>
 <div style="margin-bottom: 20px;">
-
-
-
     <div style="display: -webkit-box;">
-
-
-
-
         <button class="btn btn-outline-success btnCreate" id="myBtn">Thêm nhân viên</button>
-
-
         <!-- The Modal -->
         <div id="myModal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0);  background-color: rgba(0,0,0,0.4); -webkit-animation-name: fadeIn; -webkit-animation-duration: 0.4s; animation-name: fadeIn; animation-duration: 0.4s;">
 
@@ -72,6 +63,14 @@
                             <select id="phongBan" name="ten_phong_ban" class="form-select ">
                             </select>
                             <span id="ErrorMgsPhongBan" class="text-danger"></span>
+
+                            <label type="text" name="lon">Kinh độ</label>
+                            <input style="margin-bottom: 15px;"  name="lon" id="lon" />
+                           
+
+                            <label type="text" name="lat">Vĩ độ</label>
+                            <input style="margin-bottom: 15px;"  name="lat" id="lat" />
+                            
 
                             <input style="margin: 20px 0px;" type="submit" id="SubmitBtn" class="btn btn-success" value="Thêm mới" />
 
@@ -132,9 +131,10 @@
     </div>
 
 
+    <a href="/staff/viewMap" style="margin-left: 10px" class="btn btn btn-outline-success float-right" id="viewMap">Xem vị trí nhân viên</a>
 
     @*xuat file excel============================================================*@
-    <button style="position: relative;margin-left: 460px;" class="btn btn btn-outline-success float-right" id="excelExport"><i class="fas fa-file-excel"></i> Xuất File Excel</button>
+    <button style="position: relative;margin-left: 284px;" class="btn btn btn-outline-success float-right" id="excelExport"><i class="fas fa-file-excel"></i> Xuất File Excel</button>
 
     @*Phần import excel====================================================*@
     <button style="margin-left: 10px;" id="ImportExcel" class="btn btn-dark">Import Excel</button>
@@ -182,7 +182,12 @@
             <th>
                 Phòng ban
             </th>
-            <th></th>
+            <th>
+                Kinh độ
+            </th>
+            <th>
+                Vĩ độ
+            </th>
         </tr>
     </thead>
 

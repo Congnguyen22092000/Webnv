@@ -1,0 +1,59 @@
+﻿@model List<WebNhanVien.Models.NhanVien>
+@{
+
+    var dem = Model.Count;
+    Layout = "StaffLayout";
+}
+<link rel="stylesheet" href="~/css/Staffcss/viewMap.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+<style>
+    #mapid {
+        position: absolute;
+        bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0
+    }
+</style>
+<input id="check" type="number" value="0" hidden/>
+<input id="dem" type="number" value=@dem hidden />
+
+<input id="SearchBox" style="" type="text" placeholder="Từ Khóa Cần Tìm" />
+
+<div id="searchMap" style="">
+
+    <button id="btnSearch" class="btn btn-success">Tìm kiếm</button>
+    <button id="btnDelete" class="btn btn-danger">Xóa</button>
+</div>
+
+
+<div style="z-index: 1;" id="mapid">
+
+</div>
+<div id="tableView" hidden>
+
+</div>
+
+<script>
+    var mymap = L.map('mapid').setView([20.82, 106.056], 10);
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoiZ25vYzIyMDkiLCJhIjoiY2tvdGd5NXlpMDF6dTJ3bnJvNmU2cGk0ZyJ9.UmN5ALZPOrNosd4GreBc4Q'
+    }).addTo(mymap);
+</script>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/viewMap.js"></script>
+}

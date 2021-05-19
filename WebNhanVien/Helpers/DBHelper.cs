@@ -252,7 +252,7 @@ namespace WebNhanVien.Helpers
             using (var connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
-                connection.Execute("insert into \"Cong_Data\"(\"maNhanVien\",\"hoTen\",\"ngaySinh\",\"soDT\",\"diaChi\",\"chucVu\",\"phong_ban_id\") values(@maNhanVien,@hoTen,@ngaySinh,@soDT,@diaChi,@chucVu,@phong_ban_id)", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id });
+                connection.Execute("insert into \"Cong_Data\"(\"maNhanVien\",\"hoTen\",\"ngaySinh\",\"soDT\",\"diaChi\",\"chucVu\",\"phong_ban_id\",\"lon\" ,\"lat\" ) values(@maNhanVien,@hoTen,@ngaySinh,@soDT,@diaChi,@chucVu,@phong_ban_id,@lon,@lat)", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id,nv.lon,nv.lat });
 
             }
         }
@@ -278,7 +278,7 @@ namespace WebNhanVien.Helpers
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
                     connection.Open();
-                    connection.Execute("Update \"Cong_Data\" SET  \"hoTen\" = @hoTen ,\"ngaySinh\" = @ngaySinh, \"soDT\" = @soDT,\"diaChi\" = @diaChi,\"chucVu\" = @chucVu,\"phong_ban_id\" = @phong_ban_id WHERE \"maNhanVien\" = @maNhanVien", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id });
+                    connection.Execute("Update \"Cong_Data\" SET  \"hoTen\" = @hoTen ,\"ngaySinh\" = @ngaySinh, \"soDT\" = @soDT,\"diaChi\" = @diaChi,\"chucVu\" = @chucVu,\"phong_ban_id\" = @phong_ban_id,\"lon\" = @lon ,\"lat\" = @lat WHERE \"maNhanVien\" = @maNhanVien", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id,nv.lon,nv.lat });
 
                 }
             }
@@ -287,7 +287,7 @@ namespace WebNhanVien.Helpers
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
                     connection.Open();
-                    connection.Execute("insert into \"Cong_Data\"(\"maNhanVien\",\"hoTen\",\"ngaySinh\",\"soDT\",\"diaChi\",\"chucVu\",\"phong_ban_id\") values(@maNhanVien,@hoTen,@ngaySinh,@soDT,@diaChi,@chucVu,@phong_ban_id)", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id });
+                    connection.Execute("insert into \"Cong_Data\"(\"maNhanVien\",\"hoTen\",\"ngaySinh\",\"soDT\",\"diaChi\",\"chucVu\",\"phong_ban_id\",\"lon\" ,\"lat\" ) values(@maNhanVien,@hoTen,@ngaySinh,@soDT,@diaChi,@chucVu,@phong_ban_id,@lon,@lat)", new { nv.maNhanVien, nv.hoTen, nv.ngaySinh, nv.soDT, nv.diaChi, nv.chucVu, nv.phong_ban_id, nv.lon, nv.lat });
 
                 }
             }
@@ -544,6 +544,42 @@ namespace WebNhanVien.Helpers
                 }
             }
             return strInput;
+        }
+
+        //Tìm kiếm nhan vien cho map
+        public static List<NhanVien> SearchMap(string key = "")
+        {
+
+            IEnumerable<NhanVien> nhanvien = null;
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                if (key == null)
+                {
+                    nhanvien = connection.Query<NhanVien>("select* from \"Cong_Data\"");
+                }
+                else
+                {
+                    nhanvien = connection.Query<NhanVien>("select* from \"Cong_Data\" where lower(unaccent(\"hoTen\")) like '%' || lower(unaccent(@keyBox)) || '%' or lower(unaccent(\"maNhanVien\")) like '%' || lower(unaccent(@keyBox)) || '%' ", new { keyBox = key });
+                }
+                
+            }
+            return nhanvien.ToList();
+        }
+
+        public static List<NhanVien> SearchLonLat(string mnv = "")
+        {
+
+            IEnumerable<NhanVien> nhanvien = null;
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                
+                    nhanvien = connection.Query<NhanVien>("select* from \"Cong_Data\" where \"maNhanVien\"=@maNhanVien ", new { maNhanVien = mnv });
+               
+
+            }
+            var tempList = nhanvien.ToList();
+            tempList[0].ten_phong_ban = ParsePhongBan(tempList[0].phong_ban_id);
+            return tempList;
         }
     }
 }

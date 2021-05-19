@@ -35,6 +35,10 @@ namespace WebNhanVien.Models
         public int phong_ban_id { get; set; }
 
         public string ten_phong_ban { get; set; }
+
+        public double lon { get; set; }
+
+        public double lat { get; set; }
         public NhanVien() { }
 
 

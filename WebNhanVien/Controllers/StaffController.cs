@@ -469,5 +469,31 @@ namespace WebNhanVien.Controllers
             return View(DBHelper.GetPhongBan());
         }
 
+        [HttpGet]
+        public ActionResult ViewMap()
+        {
+            
+            return View(DBHelper.Get("", ""));
+        }
+        
+        public List<NhanVien> getListNV()
+        {
+            List<NhanVien> nv = new List<NhanVien>();
+            nv = DBHelper.Get("","");
+            return nv;
+        }
+        [HttpPost]
+        public ActionResult GetSearchMap(string key="")
+        {
+            var check = DBHelper.SearchMap(key);
+            return View(DBHelper.SearchMap(key));
+        }
+
+        public List<NhanVien> searchLonLat(string key = "")
+        {
+            List<NhanVien> nv = new List<NhanVien>();
+            nv = DBHelper.SearchLonLat(key).ToList();
+            return nv;
+        }
     }
 }
